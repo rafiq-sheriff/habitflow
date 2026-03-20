@@ -1,0 +1,1189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>HabitFlow — Daily Habit & Reflection Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d0f14;--bg2:#13161e;--bg3:#1a1e2a;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
+  --accent:#7c6af7;--accent2:#5b4de0;
+  --yes:#34d399;--yes-bg:rgba(52,211,153,0.12);
+  --no:#f87171;--no-bg:rgba(248,113,113,0.12);
+  --text:#f0f2f8;--text2:#9aa0b8;--text3:#5c6380;
+  --card:#161a25;--card2:#1c2030;
+  --r:14px;--r2:10px;
+}
+html{font-size:16px}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:'Syne',sans-serif;font-weight:700;letter-spacing:-0.02em}
+button{cursor:pointer;border:none;outline:none;font-family:'DM Sans',sans-serif}
+input,textarea,select{font-family:'DM Sans',sans-serif;outline:none}
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:var(--bg2)}
+::-webkit-scrollbar-thumb{background:var(--bg3);border-radius:3px}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.fade{animation:fadeIn .3s ease both}
+.spinner{display:inline-block;width:20px;height:20px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle}
+/* Buttons */
+.btn{display:inline-flex;align-items:center;gap:7px;padding:10px 20px;border-radius:var(--r2);font-weight:600;font-size:14px;transition:all .18s;cursor:pointer}
+.btn-primary{background:linear-gradient(135deg,#7c6af7,#a78bfa);color:#fff}
+.btn-primary:hover{opacity:.88;transform:translateY(-1px);box-shadow:0 4px 16px rgba(124,106,247,.4)}
+.btn-secondary{background:var(--bg3);color:var(--text2);border:1px solid var(--border2)}
+.btn-secondary:hover{background:var(--card2);color:var(--text)}
+.btn-ghost{background:transparent;color:var(--text2);border:1px solid transparent;padding:7px 13px;font-size:13px}
+.btn-ghost:hover{background:var(--bg3);color:var(--text)}
+/* Inputs */
+.inp{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);color:var(--text);padding:11px 14px;font-size:14px;width:100%;transition:border-color .2s}
+.inp:focus{border-color:var(--accent)}
+.inp::placeholder{color:var(--text3)}
+/* Card */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:18px}
+/* Layout */
+#app{display:flex;min-height:100vh}
+#sidebar{width:220px;min-height:100vh;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;z-index:100}
+#main{margin-left:220px;flex:1;padding:30px 32px;max-width:920px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;width:100%;text-align:left;font-size:13px;cursor:pointer;transition:all .15s;background:transparent;color:var(--text2);border:1px solid transparent}
+.nav-item.active{background:rgba(124,106,247,.15);color:var(--accent);border-color:rgba(124,106,247,.25);font-weight:600}
+.nav-item:hover:not(.active){background:var(--bg3);color:var(--text)}
+/* Page header */
+.ph h1{font-size:24px;color:var(--text);margin-bottom:3px}
+.ph p{color:var(--text2);font-size:14px;margin-bottom:20px}
+/* Stat grid */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:16px}
+.stat-val{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;margin-bottom:3px}
+.stat-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em}
+/* Q card */
+.q-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:16px 18px;margin-bottom:10px;transition:all .25s}
+.q-card.yes{background:rgba(52,211,153,.06);border-color:rgba(52,211,153,.2)}
+.q-card.no{background:rgba(248,113,113,.06);border-color:rgba(248,113,113,.2)}
+.toggle-btn{padding:8px 18px;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;transition:all .18s;display:inline-flex;align-items:center;gap:5px}
+.toggle-yes{background:transparent;color:var(--text3);border:1px solid var(--border)}
+.toggle-yes.active{background:var(--yes-bg);color:var(--yes);border-color:rgba(52,211,153,.25)}
+.toggle-no{background:transparent;color:var(--text3);border:1px solid var(--border)}
+.toggle-no.active{background:var(--no-bg);color:var(--no);border-color:rgba(248,113,113,.25)}
+/* Progress bar */
+.prog-wrap{background:var(--bg3);height:5px;border-radius:3px;overflow:hidden;margin-top:6px}
+.prog-bar{height:100%;background:linear-gradient(135deg,#7c6af7,#a78bfa);border-radius:3px;transition:width .4s cubic-bezier(.4,0,.2,1)}
+/* Error / success banners */
+.msg-err{background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.2);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--no);margin-bottom:12px}
+.msg-ok{background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.2);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--yes);margin-bottom:12px}
+/* Calendar */
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cal-day{aspect-ratio:1;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;border:1px solid transparent;transition:all .15s;cursor:default}
+.cal-day.has-entry{cursor:pointer}
+.cal-day.selected{border:2px solid var(--accent)!important;background:rgba(124,106,247,.3)!important}
+/* History list */
+.hist-btn{width:100%;text-align:left;padding:11px 13px;background:var(--card);border:1px solid var(--border);border-radius:10px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:11px;margin-bottom:6px}
+.hist-btn:hover,.hist-btn.active{background:rgba(124,106,247,.1);border-color:rgba(124,106,247,.25)}
+/* Toggle switch */
+.sw-wrap{width:44px;height:24px;border-radius:12px;position:relative;cursor:pointer;transition:background .2s;flex-shrink:0;border:none}
+.sw-knob{width:18px;height:18px;border-radius:50%;background:#fff;position:absolute;top:3px;transition:left .2s cubic-bezier(.4,0,.2,1);box-shadow:0 1px 4px rgba(0,0,0,.3)}
+/* Drag handle */
+.drag-handle{color:var(--text3);font-size:16px;cursor:grab;user-select:none;padding:0 4px;flex-shrink:0}
+/* Inline bar */
+.perf-bar-wrap{height:4px;background:var(--bg3);border-radius:2px;overflow:hidden;margin-top:3px}
+.perf-bar{height:100%;border-radius:2px;transition:width .5s ease}
+/* Tip box */
+.tip{margin-top:12px;padding:10px 13px;background:var(--bg2);border:1px solid var(--border);border-radius:9px;font-size:11px;color:var(--text3);line-height:1.6}
+/* Mobile nav */
+#mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--bg2);border-top:1px solid var(--border);z-index:200;padding:6px 4px;justify-content:space-around}
+.mob-btn{display:flex;flex-direction:column;align-items:center;gap:2px;padding:7px 12px;background:transparent;border:none;color:var(--text3);font-size:10px;cursor:pointer;border-radius:8px;transition:color .15s}
+.mob-btn.active{color:var(--accent)}
+@media(max-width:700px){
+  #sidebar{display:none}
+  #mobile-nav{display:flex}
+  #main{margin-left:0;padding:18px 16px 88px;max-width:100%}
+}
+/* Chart bars (pure CSS) */
+.chart-bars{display:flex;align-items:flex-end;gap:6px;height:120px;padding:8px 0}
+.chart-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.chart-bar{width:100%;border-radius:4px 4px 0 0;transition:height .5s ease;min-height:2px}
+.chart-bar-label{font-size:10px;color:var(--text3)}
+.chart-bar-val{font-size:9px;color:var(--text2)}
+/* Trend sparkline */
+.sparkline{width:100%;height:80px;margin:8px 0}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="loading-screen" style="display:flex;align-items:center;justify-content:center;height:100vh;width:100%;flex-direction:column;gap:16px">
+    <div style="width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#7c6af7,#a78bfa);display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 6px 24px rgba(124,106,247,.35)">✦</div>
+    <div class="spinner" style="width:26px;height:26px"></div>
+  </div>
+</div>
+
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+// ── Supabase ──────────────────────────────────────────────────
+const sb = createClient(
+  'https://umgnwpoiuvftylzvubhb.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtZ253cG9pdXZmdHlsenZ1YmhiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5NDU3NjMsImV4cCI6MjA4OTUyMTc2M30.kpmjQW95NrLF05Ae4aWyfrHoEEdbSdMy1PrfAY3AhJY'
+);
+
+// ── State ─────────────────────────────────────────────────────
+let session = null;
+let currentPage = 'dashboard';
+
+// ── Helpers ───────────────────────────────────────────────────
+const $ = id => document.getElementById(id);
+const el = (tag, attrs={}, ...children) => {
+  const e = document.createElement(tag);
+  for (const [k,v] of Object.entries(attrs)) {
+    if (k === 'className') e.className = v;
+    else if (k === 'style' && typeof v === 'object') Object.assign(e.style, v);
+    else if (k.startsWith('on')) e.addEventListener(k.slice(2).toLowerCase(), v);
+    else e.setAttribute(k, v);
+  }
+  for (const c of children) {
+    if (c == null || c === false) continue;
+    e.appendChild(typeof c === 'string' ? document.createTextNode(c) : c);
+  }
+  return e;
+};
+const today = () => new Date().toISOString().split('T')[0];
+const fmtDate = (d, opts) => new Date(d + 'T12:00:00').toLocaleDateString('en-US', opts);
+const fmtTime = t => { const [h,m]=t.split(':'); const H=Number(h); return `${H>12?H-12:H||12}:${m} ${H>=12?'PM':'AM'}`; };
+
+// ── Render root ───────────────────────────────────────────────
+async function init() {
+  const { data: { session: s } } = await sb.auth.getSession();
+  session = s;
+  sb.auth.onAuthStateChange((_e, s) => { session = s; if (!s) renderAuth(); else renderApp(); });
+  $('loading-screen').remove();
+  session ? renderApp() : renderAuth();
+}
+
+// ══════════════════════════════════════════════════════════════
+// AUTH PAGE
+// ══════════════════════════════════════════════════════════════
+function renderAuth() {
+  document.getElementById('app').innerHTML = '';
+  let mode = 'login';
+
+  const errBox = el('div', { className:'msg-err', style:{display:'none'} });
+  const okBox  = el('div', { className:'msg-ok',  style:{display:'none'} });
+
+  const nameWrap = el('div', {},
+    el('label', { style:{fontSize:'12px',color:'var(--text2)',fontWeight:'500',display:'block',marginBottom:'5px'} }, 'Full Name'),
+    el('input', { className:'inp', id:'auth-name', placeholder:'Your name' })
+  );
+
+  const form = el('form', { onSubmit: handleAuth },
+    nameWrap,
+    el('div', { style:{marginBottom:'12px'} },
+      el('label', { style:{fontSize:'12px',color:'var(--text2)',fontWeight:'500',display:'block',marginBottom:'5px'} }, 'Email'),
+      el('input', { className:'inp', id:'auth-email', type:'email', placeholder:'you@example.com', required:'' })
+    ),
+    el('div', { style:{marginBottom:'14px'} },
+      el('label', { style:{fontSize:'12px',color:'var(--text2)',fontWeight:'500',display:'block',marginBottom:'5px'} }, 'Password'),
+      el('input', { className:'inp', id:'auth-pw', type:'password', placeholder:'••••••••', minlength:'6', required:'' })
+    ),
+    errBox, okBox,
+    el('button', { type:'submit', className:'btn btn-primary', id:'auth-btn', style:{width:'100%',justifyContent:'center',padding:'13px',fontSize:'15px',marginTop:'4px'} }, 'Sign In')
+  );
+
+  const modeBtns = ['login','signup'].map(m => {
+    const b = el('button', { type:'button', className:'btn', style:{flex:'1',justifyContent:'center',padding:'8px',fontSize:'13px',background: m==='login'?'var(--bg3)':'transparent',color:m==='login'?'var(--text)':'var(--text3)',border:m==='login'?'1px solid var(--border2)':'1px solid transparent',borderRadius:'8px'} }, m === 'login' ? 'Sign In' : 'Sign Up');
+    b.addEventListener('click', () => {
+      mode = m;
+      modeBtns.forEach((x,i) => { x.style.background=i===modeBtns.indexOf(b)?'var(--bg3)':'transparent'; x.style.color=i===modeBtns.indexOf(b)?'var(--text)':'var(--text3)'; x.style.border=i===modeBtns.indexOf(b)?'1px solid var(--border2)':'1px solid transparent'; });
+      nameWrap.style.display = m === 'signup' ? 'block' : 'none';
+      $('auth-btn').textContent = m === 'login' ? 'Sign In' : 'Create Account';
+      errBox.style.display = 'none'; okBox.style.display = 'none';
+    });
+    return b;
+  });
+  nameWrap.style.display = 'none';
+
+  async function handleAuth(e) {
+    e.preventDefault();
+    const btn = $('auth-btn');
+    btn.innerHTML = '<span class="spinner"></span>';
+    errBox.style.display = 'none'; okBox.style.display = 'none';
+    const email = $('auth-email').value, pw = $('auth-pw').value, name = $('auth-name')?.value;
+    try {
+      if (mode === 'signup') {
+        const { data, error } = await sb.auth.signUp({ email, password: pw, options:{ data:{ full_name: name } } });
+        if (error) throw error;
+        if (data.session) {
+          session = data.session; renderApp();
+        } else if (data.user && !data.session) {
+          // Email confirmation required - show clear message
+          okBox.innerHTML = '✉️ <strong>Check your email!</strong><br><span style="font-size:12px;opacity:.85">A confirmation link was sent to <strong>' + email + '</strong>. Click it, then come back and Sign In.</span>';
+          okBox.style.display='block';
+        } else {
+          errBox.textContent = 'Signup failed — no user or session returned. Try again.';
+          errBox.style.display = 'block';
+        }
+      } else {
+        const { data, error } = await sb.auth.signInWithPassword({ email, password: pw });
+        if (error) throw error;
+        session = data.session; renderApp();
+      }
+    } catch(err) {
+      let msg = err.message || 'Network error';
+      if (msg.includes('fetch') || msg.includes('network') || msg.includes('Failed to fetch')) {
+        msg = '⚠️ Network blocked — this app must be opened in a browser tab, not inside the Claude preview. Download the file and open it directly.';
+      } else if (msg.includes('Email not confirmed')) {
+        msg = '✉️ Please confirm your email first — check your inbox for a link from Supabase, then sign in.';
+      }
+      errBox.innerHTML = msg;
+      errBox.style.display = 'block';
+    }
+    btn.textContent = mode === 'login' ? 'Sign In' : 'Create Account';
+  }
+
+  // Orbs
+  const orb1 = el('div',{style:{position:'absolute',width:'500px',height:'500px',borderRadius:'50%',background:'radial-gradient(circle,rgba(124,106,247,.1) 0%,transparent 70%)',top:'-150px',left:'-150px',pointerEvents:'none'}});
+  const orb2 = el('div',{style:{position:'absolute',width:'400px',height:'400px',borderRadius:'50%',background:'radial-gradient(circle,rgba(167,139,250,.07) 0%,transparent 70%)',bottom:'-100px',right:'-100px',pointerEvents:'none'}});
+
+  const wrap = el('div', { style:{width:'100%',maxWidth:'420px'} },
+    el('div',{style:{textAlign:'center',marginBottom:'36px'}},
+      el('div',{style:{width:'54px',height:'54px',borderRadius:'15px',background:'linear-gradient(135deg,#7c6af7,#a78bfa)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'24px',margin:'0 auto 14px',boxShadow:'0 8px 32px rgba(124,106,247,.35)'}},'✦'),
+      el('h1',{style:{fontSize:'27px',marginBottom:'6px'}},'HabitFlow'),
+      el('p',{style:{color:'var(--text2)',fontSize:'14px'}},'Track habits. Reflect daily. Build streaks.')
+    ),
+    el('div',{className:'card',style:{padding:'28px',boxShadow:'0 8px 40px rgba(0,0,0,.6)'}},
+      el('div',{style:{display:'flex',background:'var(--bg2)',borderRadius:'10px',padding:'3px',marginBottom:'22px',gap:'3px'}},...modeBtns),
+      form
+    ),
+    el('p',{style:{textAlign:'center',marginTop:'18px',fontSize:'12px',color:'var(--text3)'}},'Daily reflection builds extraordinary habits.')
+  );
+
+  const page = el('div',{style:{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',padding:'24px',position:'relative',overflow:'hidden'}},orb1,orb2,wrap);
+  page.classList.add('fade');
+  const appEl2 = document.getElementById('app');
+  appEl2.innerHTML = '';
+
+  // Production build - no iframe restrictions
+
+  appEl2.appendChild(page);
+}
+
+// ══════════════════════════════════════════════════════════════
+// APP SHELL
+// ══════════════════════════════════════════════════════════════
+function renderApp() {
+  const app = document.getElementById('app');
+  app.innerHTML = '';
+
+  const NAV = [
+    {id:'dashboard',label:'Dashboard',icon:'◈'},
+    {id:'daily',    label:'Daily Form', icon:'✦'},
+    {id:'history',  label:'History',    icon:'◷'},
+    {id:'questions',label:'Questions',  icon:'❋'},
+    {id:'settings', label:'Settings',   icon:'⚙'},
+  ];
+
+  const name  = session?.user?.user_metadata?.full_name || session?.user?.email?.split('@')[0] || 'User';
+  const init_ = name[0]?.toUpperCase();
+
+  // Sidebar
+  const navItems = {};
+  const navList  = el('nav',{style:{flex:'1',padding:'12px 10px',display:'flex',flexDirection:'column',gap:'3px'}});
+  NAV.forEach(n => {
+    const badge = n.id==='daily' ? el('span',{style:{marginLeft:'auto',width:'6px',height:'6px',borderRadius:'50%',background:localStorage.getItem(`submitted_${today()}`)? 'var(--yes)':'var(--accent)',display:'block',flexShrink:'0',animation:localStorage.getItem(`submitted_${today()}`)? 'none':'pulse 2s infinite'}}) : null;
+    const b = el('button',{className:'nav-item'+(currentPage===n.id?' active':'')},
+      el('span',{style:{fontSize:'15px',width:'18px',textAlign:'center'}},n.icon),
+      el('span',{},n.label),
+      ...( badge ? [badge] : [])
+    );
+    b.addEventListener('click',()=>navigate(n.id));
+    navItems[n.id] = b;
+    navList.appendChild(b);
+  });
+
+  const sidebar = el('div',{id:'sidebar'},
+    el('div',{style:{padding:'22px 18px 16px',borderBottom:'1px solid var(--border)'}},
+      el('div',{style:{display:'flex',alignItems:'center',gap:'10px'}},
+        el('div',{style:{width:'32px',height:'32px',borderRadius:'9px',background:'linear-gradient(135deg,#7c6af7,#a78bfa)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'15px',flexShrink:'0'}},'✦'),
+        el('div',{},
+          el('div',{style:{fontFamily:"'Syne',sans-serif",fontWeight:'800',fontSize:'14px',color:'var(--text)'}},'HabitFlow'),
+          el('div',{style:{fontSize:'10px',color:'var(--text3)'}},'Daily Reflection')
+        )
+      )
+    ),
+    navList,
+    el('div',{style:{padding:'12px 10px',borderTop:'1px solid var(--border)'}},
+      el('div',{style:{display:'flex',alignItems:'center',gap:'8px',marginBottom:'8px'}},
+        el('div',{style:{width:'28px',height:'28px',borderRadius:'50%',background:'linear-gradient(135deg,#7c6af7,#a78bfa)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'12px',fontWeight:'700',color:'white',flexShrink:'0'}},init_),
+        el('div',{style:{overflow:'hidden'}},
+          el('div',{style:{fontSize:'12px',fontWeight:'600',color:'var(--text)',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}},name),
+          el('div',{style:{fontSize:'10px',color:'var(--text3)',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}},session?.user?.email||'')
+        )
+      ),
+      el('button',{style:{width:'100%',padding:'7px 10px',borderRadius:'7px',background:'transparent',border:'1px solid var(--border)',color:'var(--text3)',fontSize:'11px',cursor:'pointer',display:'flex',alignItems:'center',gap:'5px',justifyContent:'center'},
+        onClick:async()=>await sb.auth.signOut()
+      },'→ Sign out')
+    )
+  );
+
+  // Mobile nav
+  const mobileNav = el('div',{id:'mobile-nav'});
+  NAV.forEach(n => {
+    const mb = el('button',{className:'mob-btn'+(currentPage===n.id?' active':'')},
+      el('span',{style:{fontSize:'19px'}},n.icon)
+    );
+    mb.addEventListener('click',()=>navigate(n.id));
+    mobileNav.appendChild(mb);
+  });
+
+  const mainEl = el('div',{id:'main'});
+  app.appendChild(sidebar);
+  app.appendChild(mainEl);
+  app.appendChild(mobileNav);
+
+  function navigate(page) {
+    currentPage = page;
+    document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('.mob-btn').forEach((x,i)=>x.classList.toggle('active',NAV[i].id===page));
+    if (navItems[page]) navItems[page].classList.add('active');
+    renderPage(page, mainEl);
+  }
+
+  renderPage(currentPage, mainEl);
+  window._navigate = navigate;
+}
+
+// ══════════════════════════════════════════════════════════════
+// PAGE ROUTER
+// ══════════════════════════════════════════════════════════════
+function renderPage(page, container) {
+  container.innerHTML = '';
+  const wrap = el('div',{className:'fade'});
+  container.appendChild(wrap);
+  const uid = session.user.id;
+  switch(page) {
+    case 'dashboard': renderDashboard(wrap, uid); break;
+    case 'daily':     renderDailyForm(wrap, uid); break;
+    case 'history':   renderHistory(wrap, uid); break;
+    case 'questions': renderQuestions(wrap, uid); break;
+    case 'settings':  renderSettings(wrap, uid); break;
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// DAILY FORM
+// ══════════════════════════════════════════════════════════════
+async function renderDailyForm(wrap, uid) {
+  const dateLabel = fmtDate(today(), {weekday:'long',month:'long',day:'numeric'});
+  wrap.appendChild(ph('Daily Reflection', dateLabel));
+  wrap.appendChild(el('div',{id:'df-content'},el('div',{style:{padding:'40px',textAlign:'center'}},el('div',{className:'spinner',style:{width:'28px',height:'28px'}}))));
+
+  const { data: qs } = await sb.from('questions').select('*').eq('user_id',uid).eq('is_active',true).order('sort_order').order('created_at');
+  const { data: entry } = await sb.from('daily_entries').select('*').eq('user_id',uid).eq('entry_date',today()).maybeSingle();
+
+  const cont = $('df-content');
+  cont.innerHTML = '';
+
+  if (entry) {
+    localStorage.setItem(`submitted_${today()}`,'1');
+    const { data: resps } = await sb.from('responses').select('*').eq('entry_id', entry.id);
+    cont.appendChild(renderSubmittedView(resps||[]));
+    return;
+  }
+  if (!qs || qs.length === 0) {
+    cont.appendChild(el('div',{className:'card',style:{textAlign:'center',padding:'48px'}},
+      el('div',{style:{fontSize:'44px',marginBottom:'14px'}},'❋'),
+      el('h3',{style:{fontSize:'18px',marginBottom:'8px'}},'No active questions'),
+      el('p',{style:{color:'var(--text2)',fontSize:'14px',marginBottom:'22px'}},'Set up your daily questions first.'),
+      el('button',{className:'btn btn-primary',onClick:()=>window._navigate('questions')},'Add Questions')
+    ));
+    return;
+  }
+
+  const answers = {}, notes = {};
+  qs.forEach(q => { answers[q.id] = null; notes[q.id] = ''; });
+
+  // Progress
+  const progCount = el('span',{style:{fontSize:'13px',fontWeight:'600',color:'var(--accent)'}},`0 / ${qs.length}`);
+  const progBar = el('div',{className:'prog-bar',style:{width:'0%'}});
+  cont.appendChild(el('div',{className:'card',style:{marginBottom:'18px'}},
+    el('div',{style:{display:'flex',justifyContent:'space-between',marginBottom:'7px'}},
+      el('span',{style:{fontSize:'13px',color:'var(--text2)'}},'Progress'),
+      progCount
+    ),
+    el('div',{className:'prog-wrap'},progBar)
+  ));
+
+  const errBox = el('div',{className:'msg-err',style:{display:'none'}});
+  cont.appendChild(errBox);
+
+  function updateProgress() {
+    const done = qs.filter(q => answers[q.id] !== null).length;
+    const pct = (done/qs.length)*100;
+    progBar.style.width = pct+'%';
+    progCount.textContent = `${done} / ${qs.length}`;
+    submitBtn.disabled = done < qs.length;
+    submitBtn.style.opacity = done < qs.length ? '0.45' : '1';
+  }
+
+  // Question cards
+  qs.forEach((q, i) => {
+    const noteArea = el('textarea',{className:'inp',placeholder:'Optional reflection note...',rows:'2',style:{resize:'vertical',lineHeight:'1.5',marginTop:'10px',display:'none'}});
+    noteArea.addEventListener('input', e => notes[q.id] = e.target.value);
+
+    const yesBtn = el('button',{className:'toggle-btn toggle-yes'},'✓ Yes');
+    const noBtn  = el('button',{className:'toggle-btn toggle-no'},'✕ No');
+    const noteToggle = el('button',{style:{marginLeft:'auto',padding:'7px 12px',borderRadius:'8px',fontSize:'12px',background:'transparent',border:'1px solid var(--border)',color:'var(--text3)',cursor:'pointer',display:'flex',alignItems:'center',gap:'4px'}},'✎ Note');
+
+    yesBtn.addEventListener('click',() => {
+      answers[q.id] = answers[q.id]===true ? null : true;
+      yesBtn.classList.toggle('active', answers[q.id]===true);
+      noBtn.classList.remove('active');
+      qCard.className = 'q-card' + (answers[q.id]===true?' yes': answers[q.id]===false?' no':'');
+      updateProgress();
+    });
+    noBtn.addEventListener('click',() => {
+      answers[q.id] = answers[q.id]===false ? null : false;
+      noBtn.classList.toggle('active', answers[q.id]===false);
+      yesBtn.classList.remove('active');
+      qCard.className = 'q-card' + (answers[q.id]===false?' no': answers[q.id]===true?' yes':'');
+      updateProgress();
+    });
+    noteToggle.addEventListener('click',() => {
+      const show = noteArea.style.display === 'none';
+      noteArea.style.display = show ? 'block' : 'none';
+      noteToggle.style.background = show ? 'var(--bg3)' : 'transparent';
+    });
+
+    const numBadge = el('div',{style:{width:'23px',height:'23px',borderRadius:'7px',background:'var(--bg3)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'9px',fontWeight:'700',color:'var(--text3)',flexShrink:'0',marginTop:'2px'}},String(i+1).padStart(2,'0'));
+
+    const qCard = el('div',{className:'q-card'},
+      el('div',{style:{display:'flex',alignItems:'flex-start',gap:'10px',marginBottom:'12px'}},
+        numBadge,
+        el('p',{style:{flex:'1',fontSize:'14px',color:'var(--text)',lineHeight:'1.5',fontWeight:'500'}},q.text)
+      ),
+      el('div',{style:{display:'flex',gap:'8px',alignItems:'center'}},yesBtn,noBtn,noteToggle),
+      noteArea
+    );
+    cont.appendChild(qCard);
+  });
+
+  // Submit button
+  const submitBtn = el('button',{className:'btn btn-primary',style:{width:'100%',justifyContent:'center',padding:'14px',fontSize:'15px',marginTop:'18px',opacity:'0.45'}},
+    'Submit Reflection ✦'
+  );
+  submitBtn.disabled = true;
+  submitBtn.addEventListener('click', async () => {
+    submitBtn.innerHTML = '<span class="spinner"></span> Submitting...';
+    submitBtn.disabled = true;
+    errBox.style.display = 'none';
+    const { data: newEntry, error: ee } = await sb.from('daily_entries').insert({user_id:uid, entry_date:today()}).select().single();
+    if (ee) { errBox.textContent = ee.message.includes('unique') ? 'Already submitted today!' : ee.message; errBox.style.display='block'; submitBtn.textContent='Submit Reflection ✦'; submitBtn.disabled=false; return; }
+    const rows = qs.map(q => ({entry_id:newEntry.id, question_id:q.id, question_text:q.text, answer:answers[q.id], note:notes[q.id]||null}));
+    await sb.from('responses').insert(rows);
+    localStorage.setItem(`submitted_${today()}`,'1');
+    cont.innerHTML = '';
+    cont.appendChild(renderSubmittedView(rows));
+  });
+  cont.appendChild(submitBtn);
+  cont.appendChild(el('p',{id:'submit-hint',style:{textAlign:'center',marginTop:'8px',fontSize:'12px',color:'var(--text3)'}},'Answer all questions to submit'));
+}
+
+function renderSubmittedView(responses) {
+  const yes = responses.filter(r=>r.answer).length;
+  const no  = responses.filter(r=>!r.answer).length;
+  const pct = Math.round((yes/(responses.length||1))*100);
+  const frag = document.createDocumentFragment();
+
+  frag.appendChild(el('div',{style:{background:'linear-gradient(135deg,rgba(52,211,153,.12),rgba(124,106,247,.12))',border:'1px solid rgba(52,211,153,.2)',borderRadius:'15px',padding:'26px',marginBottom:'18px',textAlign:'center'}},
+    el('div',{style:{fontSize:'36px',marginBottom:'10px'}},'🎉'),
+    el('h2',{style:{fontSize:'19px',marginBottom:'5px'}},"Today's reflection done!"),
+    el('p',{style:{color:'var(--text2)',fontSize:'14px',marginBottom:'18px'}},'Great job. Keep that streak going!'),
+    el('div',{style:{display:'flex',justifyContent:'center',gap:'28px'}},
+      ...([['Yes',yes,'var(--yes)'],['No',no,'var(--no)'],['Score',`${pct}%`,'var(--accent)']].map(([l,v,c])=>
+        el('div',{style:{textAlign:'center'}},
+          el('div',{style:{fontFamily:"'Syne',sans-serif",fontSize:'26px',fontWeight:'800',color:c}},String(v)),
+          el('div',{style:{fontSize:'10px',color:'var(--text3)',marginTop:'2px',textTransform:'uppercase',letterSpacing:'.05em'}},l)
+        )
+      ))
+    )
+  ));
+
+  responses.forEach((r,i) => {
+    frag.appendChild(el('div',{style:{background:'var(--card)',border:'1px solid var(--border)',borderRadius:'10px',padding:'11px 13px',display:'flex',gap:'9px',alignItems:'flex-start',marginBottom:'7px',animation:`fadeIn .3s ease ${i*.04}s both`}},
+      el('span',{style:{flexShrink:'0',width:'19px',height:'19px',borderRadius:'5px',background:r.answer?'var(--yes-bg)':'var(--no-bg)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'9px',fontWeight:'700',color:r.answer?'var(--yes)':'var(--no)',marginTop:'1px'}},r.answer?'✓':'✕'),
+      el('div',{},
+        el('p',{style:{fontSize:'13px',color:'var(--text)'}},r.question_text),
+        ...(r.note ? [el('p',{style:{fontSize:'11px',color:'var(--text2)',fontStyle:'italic',marginTop:'2px'}},`"${r.note}"`)] : [])
+      )
+    ));
+  });
+
+  const btnRow = el('div',{style:{display:'flex',gap:'10px',marginTop:'16px'}});
+  const db = el('button',{className:'btn btn-primary',style:{flex:'1',justifyContent:'center'}},'Dashboard');
+  const hb = el('button',{className:'btn btn-secondary',style:{flex:'1',justifyContent:'center'}},'History');
+  db.addEventListener('click',()=>window._navigate('dashboard'));
+  hb.addEventListener('click',()=>window._navigate('history'));
+  btnRow.appendChild(db); btnRow.appendChild(hb);
+  frag.appendChild(btnRow);
+  return frag;
+}
+
+// ══════════════════════════════════════════════════════════════
+// DASHBOARD
+// ══════════════════════════════════════════════════════════════
+async function renderDashboard(wrap, uid) {
+  const name = session?.user?.user_metadata?.full_name || session?.user?.email?.split('@')[0];
+  const h = new Date().getHours();
+  const greet = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
+
+  wrap.appendChild(el('div',{style:{marginBottom:'22px'}},
+    el('p',{style:{color:'var(--text2)',fontSize:'14px',marginBottom:'3px'}},greet+','),
+    el('h1',{style:{fontSize:'25px'}},name+' 👋')
+  ));
+
+  const loader = el('div',{style:{padding:'40px',textAlign:'center'}},el('div',{className:'spinner',style:{width:'28px',height:'28px'}}));
+  wrap.appendChild(loader);
+
+  const thirtyAgo = new Date(Date.now()-30*86400000).toISOString().split('T')[0];
+  const [{ data: summary }, { data: qStats }] = await Promise.all([
+    sb.from('v_daily_summary').select('*').eq('user_id',uid).gte('entry_date',thirtyAgo).order('entry_date'),
+    sb.from('v_question_stats').select('*').eq('user_id',uid)
+  ]);
+  const days = summary||[];
+  const todayEntry = days.find(d=>d.entry_date===today());
+
+  let streak = 0;
+  const sorted = [...days].map(d=>d.entry_date).sort((a,b)=>b.localeCompare(a));
+  for (let i=0;i<sorted.length;i++) {
+    const exp = new Date(Date.now()-i*86400000).toISOString().split('T')[0];
+    if (sorted[i]===exp) streak++; else break;
+  }
+  const totalYes = days.reduce((s,d)=>s+(d.yes_count||0),0);
+  const avgScore = days.length ? Math.round(days.reduce((s,d)=>s+(d.yes_percentage||0),0)/days.length) : 0;
+
+  loader.remove();
+
+  // Today banner
+  if (!todayEntry) {
+    const banner = el('div',{style:{background:'linear-gradient(135deg,rgba(124,106,247,.18),rgba(167,139,250,.08))',border:'1px solid rgba(124,106,247,.3)',borderRadius:'13px',padding:'14px 18px',marginBottom:'20px',display:'flex',alignItems:'center',justifyContent:'space-between',gap:'12px'}},
+      el('div',{},
+        el('div',{style:{fontFamily:"'Syne',sans-serif",fontWeight:'700',fontSize:'14px',marginBottom:'2px'}},"Today's reflection is waiting ✦"),
+        el('div',{style:{fontSize:'12px',color:'var(--text2)'}},fmtDate(today(),{weekday:'long',month:'long',day:'numeric'}))
+      ),
+      el('button',{className:'btn btn-primary',style:{flexShrink:'0',padding:'9px 16px',fontSize:'13px'},onClick:()=>window._navigate('daily')},'Start Now')
+    );
+    wrap.appendChild(banner);
+  }
+
+  // Stat cards
+  const statGrid = el('div',{className:'stat-grid'});
+  [['🔥','Current Streak',`${streak} days`,'#f97316'],
+   ['📅','Total Entries',days.length,'var(--accent)'],
+   ['✓','Avg Score',`${avgScore}%`,'var(--yes)'],
+   ['✦','Yes Answers',totalYes,'#a78bfa']
+  ].forEach(([icon,label,val,color])=>{
+    statGrid.appendChild(el('div',{className:'stat-card'},
+      el('div',{style:{display:'flex',justifyContent:'space-between',marginBottom:'9px'}},
+        el('span',{style:{fontSize:'18px'}},icon),
+        el('span',{style:{fontSize:'9px',color:'var(--text3)',background:'var(--bg3)',padding:'2px 7px',borderRadius:'20px',fontWeight:'600',letterSpacing:'.04em',textTransform:'uppercase'}},'30d')
+      ),
+      el('div',{className:'stat-val',style:{color}},String(val)),
+      el('div',{className:'stat-label'},label)
+    ));
+  });
+  wrap.appendChild(statGrid);
+
+  // 30-day chart
+  const chartCard = el('div',{className:'card',style:{marginBottom:'16px'}});
+  chartCard.appendChild(el('div',{style:{fontFamily:"'Syne',sans-serif",fontSize:'14px',fontWeight:'700',marginBottom:'2px'}},'30-Day Score Trend'));
+  chartCard.appendChild(el('div',{style:{fontSize:'11px',color:'var(--text3)',marginBottom:'10px'}},'Daily yes % over last 30 days'));
+  if (days.length > 1) {
+    chartCard.appendChild(renderBarChart(days.map(d=>({label:new Date(d.entry_date+'T12:00').toLocaleDateString('en-US',{month:'short',day:'numeric'}),value:Number(d.yes_percentage||0),color:'#7c6af7'}))));
+  } else {
+    chartCard.appendChild(el('div',{style:{height:'100px',display:'flex',alignItems:'center',justifyContent:'center',color:'var(--text3)',fontSize:'13px'}},'Complete more days to see trend'));
+  }
+  wrap.appendChild(chartCard);
+
+  // Week dots + week bar side by side
+  const row = el('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'12px',marginBottom:'16px'}});
+
+  // Week dots
+  const dotCard = el('div',{className:'card'});
+  dotCard.appendChild(el('div',{style:{fontFamily:"'Syne',sans-serif",fontSize:'13px',fontWeight:'700',marginBottom:'2px'}},'This Week'));
+  dotCard.appendChild(el('div',{style:{fontSize:'11px',color:'var(--text3)',marginBottom:'12px'}},'Daily completion'));
+  const dotsRow = el('div',{style:{display:'flex',gap:'6px'}});
+  for (let i=6;i>=0;i--) {
+    const d = new Date(Date.now()-i*86400000);
+    const ds = d.toISOString().split('T')[0];
+    const entry = days.find(x=>x.entry_date===ds);
+    const pct = entry?.yes_percentage||0;
+    let bg='var(--bg3)',color='var(--text3)';
+    if (entry) { bg=pct>=70?'rgba(52,211,153,.28)':pct>=40?'rgba(124,106,247,.28)':'rgba(248,113,113,.28)'; color=pct>=70?'var(--yes)':pct>=40?'var(--accent)':'var(--no)'; }
+    dotsRow.appendChild(el('div',{style:{flex:'1',textAlign:'center'}},
+      el('div',{style:{aspectRatio:'1',borderRadius:'6px',background:bg,border:`1px solid ${entry?'rgba(255,255,255,.1)':'var(--border)'}`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'9px',fontWeight:'700',color,marginBottom:'4px'}},entry?String(Math.round(pct)):d.getDate().toString()),
+      el('div',{style:{fontSize:'9px',color:'var(--text3)'}},d.toLocaleDateString('en-US',{weekday:'short'}))
+    ));
+  }
+  dotCard.appendChild(dotsRow);
+
+  // Week answers bar
+  const weekCard = el('div',{className:'card'});
+  weekCard.appendChild(el('div',{style:{fontFamily:"'Syne',sans-serif",fontSize:'13px',fontWeight:'700',marginBottom:'2px'}},'Week Answers'));
+  weekCard.appendChild(el('div',{style:{fontSize:'11px',color:'var(--text3)',marginBottom:'6px'}},'Yes (green) vs No (red)'));
+  const weekData = [];
+  for (let i=6;i>=0;i--) {
+    const d = new Date(Date.now()-i*86400000);
+    const ds = d.toISOString().split('T')[0];
+    const entry = days.find(x=>x.entry_date===ds);
+    weekData.push({label:d.toLocaleDateString('en-US',{weekday:'short'}),yes:entry?.yes_count||0,no:entry?.no_count||0});
+  }
+  const maxWk = Math.max(1,...weekData.map(d=>d.yes+d.no));
+  const barsEl = el('div',{className:'chart-bars'});
+  weekData.forEach(d=>{
+    const yH = Math.round((d.yes/maxWk)*90);
+    const nH = Math.round((d.no/maxWk)*90);
+    barsEl.appendChild(el('div',{className:'chart-bar-wrap'},
+      el('div',{style:{display:'flex',gap:'2px',alignItems:'flex-end',height:'100px'}},
+        el('div',{className:'chart-bar',style:{flex:'1',height:`${yH||2}px`,background:'var(--yes)'}}),
+        el('div',{className:'chart-bar',style:{flex:'1',height:`${nH||2}px`,background:'var(--no)'}})
+      ),
+      el('div',{className:'chart-bar-label'},d.label)
+    ));
+  });
+  weekCard.appendChild(barsEl);
+
+  row.appendChild(dotCard); row.appendChild(weekCard);
+  wrap.appendChild(row);
+
+  // Habit performance
+  if ((qStats||[]).length > 0) {
+    const perfCard = el('div',{className:'card'});
+    perfCard.appendChild(el('div',{style:{fontFamily:"'Syne',sans-serif",fontSize:'14px',fontWeight:'700',marginBottom:'2px'}},'Habit Performance'));
+    perfCard.appendChild(el('div',{style:{fontSize:'11px',color:'var(--text3)',marginBottom:'14px'}},'All-time yes rate per habit'));
+    const sorted_q = [...qStats].sort((a,b)=>(b.yes_percentage||0)-(a.yes_percentage||0)).slice(0,7);
+    sorted_q.forEach(q=>{
+      const pct = q.yes_percentage||0;
+      const color = pct>=70?'var(--yes)':pct>=40?'var(--accent)':'var(--no)';
+      perfCard.appendChild(el('div',{style:{marginBottom:'11px'}},
+        el('div',{style:{display:'flex',justifyContent:'space-between',marginBottom:'3px'}},
+          el('span',{style:{fontSize:'12px',color:'var(--text)',maxWidth:'82%',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}},q.question_text),
+          el('span',{style:{fontSize:'12px',fontWeight:'700',color}},`${pct}%`)
+        ),
+        el('div',{className:'perf-bar-wrap'},el('div',{className:'perf-bar',style:{width:`${pct}%`,background:color}}))
+      ));
+    });
+    wrap.appendChild(perfCard);
+  }
+}
+
+function renderBarChart(dataArr) {
+  const max = Math.max(1,...dataArr.map(d=>d.value));
+  const bars = el('div',{className:'chart-bars'});
+  // Only show ~15 items to avoid crowding
+  const slice = dataArr.length > 20 ? dataArr.filter((_,i)=>i%2===0) : dataArr;
+  slice.forEach(d=>{
+    const h = Math.round((d.value/100)*100);
+    bars.appendChild(el('div',{className:'chart-bar-wrap'},
+      el('div',{className:'chart-bar',style:{width:'100%',height:`${Math.max(h,2)}px`,background:d.color||'#7c6af7',opacity: d.value>0?'1':'0.3'}}),
+      el('div',{className:'chart-bar-val'},d.value>0?`${Math.round(d.value)}`:' ')
+    ));
+  });
+  return bars;
+}
+
+// ══════════════════════════════════════════════════════════════
+// HISTORY
+// ══════════════════════════════════════════════════════════════
+async function renderHistory(wrap, uid) {
+  wrap.appendChild(ph('History','Your reflection journey over time'));
+  let view = 'calendar', filter = '30';
+
+  const controls = el('div',{style:{display:'flex',gap:'10px',marginBottom:'16px',flexWrap:'wrap'}});
+  const viewBtns = {}, filterBtns = {};
+  const viewRow = el('div',{style:{display:'flex',background:'var(--card)',border:'1px solid var(--border)',borderRadius:'9px',padding:'3px',gap:'2px'}});
+  ['calendar','list'].forEach(v=>{
+    const b=el('button',{style:{padding:'6px 14px',borderRadius:'7px',fontSize:'12px',fontWeight:'500',background:view===v?'var(--bg3)':'transparent',color:view===v?'var(--text)':'var(--text3)',border:view===v?'1px solid var(--border2)':'1px solid transparent',cursor:'pointer',transition:'all .15s'}},v==='calendar'?'Calendar':'List');
+    b.addEventListener('click',()=>{ view=v; Object.keys(viewBtns).forEach(k=>{ viewBtns[k].style.background=k===v?'var(--bg3)':'transparent'; viewBtns[k].style.color=k===v?'var(--text)':'var(--text3)'; viewBtns[k].style.border=k===v?'1px solid var(--border2)':'1px solid transparent'; }); loadHistory(); });
+    viewBtns[v]=b; viewRow.appendChild(b);
+  });
+  const filterRow = el('div',{style:{display:'flex',background:'var(--card)',border:'1px solid var(--border)',borderRadius:'9px',padding:'3px',gap:'2px',marginLeft:'auto'}});
+  [['7','7d'],['30','30d'],['90','90d'],['all','All']].forEach(([v,l])=>{
+    const b=el('button',{style:{padding:'6px 12px',borderRadius:'7px',fontSize:'12px',fontWeight:'500',background:v===filter?'var(--bg3)':'transparent',color:v===filter?'var(--text)':'var(--text3)',border:v===filter?'1px solid var(--border2)':'1px solid transparent',cursor:'pointer',transition:'all .15s'}},l);
+    b.addEventListener('click',()=>{ filter=v; Object.keys(filterBtns).forEach(k=>{ filterBtns[k].style.background=k===v?'var(--bg3)':'transparent'; filterBtns[k].style.color=k===v?'var(--text)':'var(--text3)'; filterBtns[k].style.border=k===v?'1px solid var(--border2)':'1px solid transparent'; }); loadHistory(); });
+    filterBtns[v]=b; filterRow.appendChild(b);
+  });
+  controls.appendChild(viewRow); controls.appendChild(filterRow);
+  wrap.appendChild(controls);
+
+  const content = el('div');
+  wrap.appendChild(content);
+
+  let selectedDate = null;
+  const detailPanel = el('div',{style:{display:'none',marginTop:'14px'}});
+  wrap.appendChild(detailPanel);
+
+  async function loadHistory() {
+    content.innerHTML = '';
+    detailPanel.style.display = 'none';
+    const loader = el('div',{style:{padding:'40px',textAlign:'center'}},el('div',{className:'spinner',style:{width:'24px',height:'24px'}}));
+    content.appendChild(loader);
+
+    let q = sb.from('v_daily_summary').select('*').eq('user_id',uid).order('entry_date',{ascending:false});
+    if (filter !== 'all') q = q.gte('entry_date', new Date(Date.now()-Number(filter)*86400000).toISOString().split('T')[0]);
+    const { data: entries } = await q;
+    loader.remove();
+
+    const entList = entries||[];
+    const numDays = filter==='all'?90:Math.min(Number(filter),90);
+
+    // Mini stats
+    const miniGrid = el('div',{style:{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(110px,1fr))',gap:'10px',marginBottom:'16px'}});
+    const avg = entList.length ? Math.round(entList.reduce((s,e)=>s+(e.yes_percentage||0),0)/entList.length) : 0;
+    const best = entList.length ? Math.max(...entList.map(e=>e.yes_percentage||0)) : 0;
+    [['Entries',entList.length,'var(--text)'],['Avg Score',`${avg}%`,'var(--accent)'],['Best Day',`${best}%`,'var(--yes)'],['Completion',`${Math.round((entList.length/numDays)*100)}%`,'#a78bfa']].forEach(([l,v,c])=>{
+      miniGrid.appendChild(el('div',{className:'card',style:{padding:'12px 13px'}},
+        el('div',{style:{fontFamily:"'Syne',sans-serif",fontSize:'20px',fontWeight:'800',color:c,marginBottom:'2px'}},v),
+        el('div',{style:{fontSize:'10px',color:'var(--text3)',textTransform:'uppercase',letterSpacing:'.05em'}},l)
+      ));
+    });
+    content.appendChild(miniGrid);
+
+    const entryMap = {};
+    entList.forEach(e=>entryMap[e.entry_date]=e);
+
+    if (view === 'calendar') {
+      const calWrap = el('div',{className:'card',style:{marginBottom:'16px'}});
+      const DOW = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+      const calDays = [];
+      for (let i=numDays-1;i>=0;i--) {
+        const d=new Date(Date.now()-i*86400000);
+        calDays.push({date:d.toISOString().split('T')[0],entry:entryMap[d.toISOString().split('T')[0]]||null,dow:d.getDay()});
+      }
+      const firstDow = calDays[0]?.dow||0;
+      const headerRow = el('div',{className:'cal-grid',style:{marginBottom:'4px'}});
+      DOW.forEach(d=>headerRow.appendChild(el('div',{style:{textAlign:'center',fontSize:'10px',color:'var(--text3)',padding:'3px 0',fontWeight:'600'}},d)));
+      calWrap.appendChild(headerRow);
+
+      const grid = el('div',{className:'cal-grid'});
+      for (let i=0;i<firstDow;i++) grid.appendChild(el('div'));
+      calDays.forEach(d=>{
+        const pct = d.entry?.yes_percentage||0;
+        let bg='var(--bg3)',color='var(--text3)';
+        if (d.entry) { bg=pct>=70?'rgba(52,211,153,.25)':pct>=40?'rgba(124,106,247,.25)':'rgba(248,113,113,.25)'; color=pct>=70?'var(--yes)':pct>=40?'var(--accent)':'var(--no)'; }
+        const isToday = d.date===today();
+        const dayEl = el('div',{className:'cal-day'+(d.entry?' has-entry':'')+(selectedDate===d.date?' selected':''),style:{background:selectedDate===d.date?'rgba(124,106,247,.3)':bg,color,border:isToday?'2px solid rgba(124,106,247,.4)':'1px solid transparent'}},
+          d.entry ? String(Math.round(pct)) : String(new Date(d.date+'T12:00').getDate())
+        );
+        if (d.entry) dayEl.addEventListener('click',()=>showDetail(d.entry, d.date, dayEl));
+        grid.appendChild(dayEl);
+      });
+      calWrap.appendChild(grid);
+
+      // Legend
+      const legend = el('div',{style:{display:'flex',gap:'14px',marginTop:'12px',justifyContent:'center',flexWrap:'wrap'}});
+      [['rgba(52,211,153,.25)','var(--yes)','≥70%'],['rgba(124,106,247,.25)','var(--accent)','40-69%'],['rgba(248,113,113,.25)','var(--no)','<40%'],['var(--bg3)','var(--text3)','No entry']].forEach(([bg,c,l])=>{
+        legend.appendChild(el('div',{style:{display:'flex',alignItems:'center',gap:'4px',fontSize:'10px',color:c}},
+          el('div',{style:{width:'10px',height:'10px',borderRadius:'3px',background:bg}}),l
+        ));
+      });
+      calWrap.appendChild(legend);
+      content.appendChild(calWrap);
+    } else {
+      // List view
+      const monthGroups = {};
+      entList.forEach(e=>{ const m=e.entry_date.slice(0,7); if(!monthGroups[m])monthGroups[m]=[]; monthGroups[m].push(e); });
+      if (Object.keys(monthGroups).length===0) {
+        content.appendChild(el('div',{style:{textAlign:'center',padding:'48px',color:'var(--text3)',fontSize:'14px'}},'No entries in this range'));
+      }
+      Object.keys(monthGroups).sort((a,b)=>b.localeCompare(a)).forEach(month=>{
+        const [y,m]=month.split('-');
+        const label = new Date(Number(y),Number(m)-1).toLocaleDateString('en-US',{month:'long',year:'numeric'});
+        const mDays = monthGroups[month];
+        const mAvg = Math.round(mDays.reduce((s,d)=>s+(d.yes_percentage||0),0)/mDays.length);
+        const sec = el('div',{style:{marginBottom:'18px'}});
+        sec.appendChild(el('div',{style:{display:'flex',alignItems:'center',gap:'9px',marginBottom:'8px'}},
+          el('h3',{style:{fontFamily:"'Syne',sans-serif",fontSize:'14px',color:'var(--text)'}},label),
+          el('span',{style:{fontSize:'10px',color:'var(--accent)',background:'rgba(124,106,247,.12)',padding:'2px 9px',borderRadius:'20px',fontWeight:'600'}},`${mDays.length} entries · ${mAvg}% avg`)
+        ));
+        mDays.forEach(e=>{
+          const pct=e.yes_percentage||0;
+          const color=pct>=70?'var(--yes)':pct>=40?'var(--accent)':'var(--no)';
+          const b=el('button',{className:'hist-btn'+(selectedDate===e.entry_date?' active':'')},
+            el('div',{style:{width:'34px',height:'34px',borderRadius:'7px',flexShrink:'0',background:pct>=70?'var(--yes-bg)':pct>=40?'rgba(124,106,247,.12)':'var(--no-bg)',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:"'Syne',sans-serif",fontWeight:'800',fontSize:'12px',color}},`${pct}%`),
+            el('div',{style:{flex:'1'}},
+              el('div',{style:{fontSize:'13px',color:'var(--text)',fontWeight:'500'}},fmtDate(e.entry_date,{weekday:'short',month:'short',day:'numeric'})),
+              el('div',{style:{fontSize:'11px',color:'var(--text2)',marginTop:'1px'}},`${e.yes_count} Yes · ${e.no_count} No`)
+            ),
+            el('span',{style:{color:'var(--text3)',fontSize:'12px'}},'›')
+          );
+          b.addEventListener('click',()=>showDetail(e, e.entry_date, b));
+          sec.appendChild(b);
+        });
+        content.appendChild(sec);
+      });
+    }
+  }
+
+  async function showDetail(entry, date, triggerEl) {
+    if (selectedDate === date) { selectedDate=null; detailPanel.style.display='none'; document.querySelectorAll('.cal-day.selected,.hist-btn.active').forEach(x=>{x.classList.remove('selected');x.classList.remove('active');}); return; }
+    selectedDate = date;
+    document.querySelectorAll('.cal-day.selected').forEach(x=>x.classList.remove('selected'));
+    document.querySelectorAll('.hist-btn.active').forEach(x=>x.classList.remove('active'));
+    triggerEl.classList.add(triggerEl.classList.contains('cal-day')?'selected':'active');
+
+    detailPanel.innerHTML = '<div style="padding:20px;text-align:center"><div class="spinner" style="width:20px;height:20px"></div></div>';
+    detailPanel.style.display = 'block';
+    const { data: resps } = await sb.from('responses').select('*').eq('entry_id', entry.entry_id);
+    detailPanel.innerHTML = '';
+    detailPanel.appendChild(el('div',{className:'card'},
+      el('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'12px'}},
+        el('div',{},
+          el('h3',{style:{fontFamily:"'Syne',sans-serif",fontSize:'14px'}},fmtDate(date,{weekday:'long',year:'numeric',month:'long',day:'numeric'})),
+          el('div',{style:{display:'flex',gap:'12px',marginTop:'3px'}},
+            el('span',{style:{fontSize:'11px',color:'var(--yes)'}},`✓ ${entry.yes_count}`),
+            el('span',{style:{fontSize:'11px',color:'var(--no)'}},`✕ ${entry.no_count}`),
+            el('span',{style:{fontSize:'11px',color:'var(--accent)'}},`${entry.yes_percentage}% score`)
+          )
+        ),
+        el('button',{className:'btn btn-ghost',style:{padding:'5px 9px',fontSize:'12px'},onClick:()=>{ selectedDate=null; detailPanel.style.display='none'; }}, '✕')
+      ),
+      ...(resps||[]).map(r=>el('div',{style:{display:'flex',gap:'8px',padding:'9px 11px',background:'var(--bg2)',borderRadius:'8px',marginBottom:'6px',alignItems:'flex-start'}},
+        el('span',{style:{flexShrink:'0',width:'19px',height:'19px',borderRadius:'5px',background:r.answer?'var(--yes-bg)':'var(--no-bg)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'9px',fontWeight:'700',color:r.answer?'var(--yes)':'var(--no)',marginTop:'1px'}},r.answer?'✓':'✕'),
+        el('div',{},
+          el('p',{style:{fontSize:'13px',color:'var(--text)'}},r.question_text),
+          ...(r.note?[el('p',{style:{fontSize:'11px',color:'var(--text2)',fontStyle:'italic',marginTop:'2px'}},`"${r.note}"`)]:[])
+        )
+      ))
+    ));
+  }
+
+  loadHistory();
+}
+
+// ══════════════════════════════════════════════════════════════
+// QUESTION MANAGER
+// ══════════════════════════════════════════════════════════════
+async function renderQuestions(wrap, uid) {
+  wrap.appendChild(ph('Questions',''));
+  const subhead = el('p',{style:{color:'var(--text2)',fontSize:'14px',marginBottom:'18px'}},'Loading...');
+  wrap.appendChild(subhead);
+
+  const errBox = el('div',{className:'msg-err',style:{display:'none'}});
+  wrap.appendChild(errBox);
+
+  const addArea = el('div',{style:{display:'none',background:'rgba(124,106,247,.08)',border:'1px solid rgba(124,106,247,.25)',borderRadius:'13px',padding:'16px',marginBottom:'14px'}});
+  const newTextArea = el('textarea',{className:'inp',placeholder:'e.g. Did I exercise for 30 minutes today?',rows:'2',style:{resize:'vertical',marginBottom:'10px'}});
+  const addConfirm = el('button',{className:'btn btn-primary',style:{padding:'8px 18px',fontSize:'13px'}},'Add');
+  const addCancel  = el('button',{className:'btn btn-ghost',style:{padding:'8px 12px',fontSize:'13px'}},'Cancel');
+  addArea.appendChild(el('p',{style:{fontSize:'12px',fontWeight:'600',color:'var(--accent)',marginBottom:'8px'}},'New Question'));
+  addArea.appendChild(newTextArea);
+  addArea.appendChild(el('div',{style:{display:'flex',gap:'8px'}},addConfirm,addCancel));
+  wrap.appendChild(addArea);
+
+  const addBtn = el('button',{className:'btn btn-primary'},'+ Add Question');
+  const headerRow = el('div',{style:{display:'flex',alignItems:'center',justifyContent:'flex-end',marginBottom:'6px',marginTop:'-12px'}});
+  headerRow.appendChild(addBtn);
+  wrap.insertBefore(headerRow, addArea);
+
+  const listEl = el('div');
+  wrap.appendChild(listEl);
+
+  addBtn.addEventListener('click',()=>{ addArea.style.display='block'; addBtn.style.display='none'; newTextArea.focus(); });
+  addCancel.addEventListener('click',()=>{ addArea.style.display='none'; addBtn.style.display='flex'; newTextArea.value=''; });
+  newTextArea.addEventListener('keydown',e=>{ if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();doAdd();} });
+
+  let questions = [];
+  let draggingId = null;
+
+  async function load() {
+    listEl.innerHTML = '<div style="padding:30px;text-align:center"><div class="spinner" style="width:22px;height:22px"></div></div>';
+    const { data } = await sb.from('questions').select('*').eq('user_id',uid).order('sort_order').order('created_at');
+    questions = data||[];
+    render();
+  }
+
+  async function doAdd() {
+    const text = newTextArea.value.trim();
+    if (!text) return;
+    addConfirm.innerHTML = '<span class="spinner"></span>';
+    const maxOrd = questions.length ? Math.max(...questions.map(q=>q.sort_order))+1 : 0;
+    const { data, error } = await sb.from('questions').insert({user_id:uid,text,sort_order:maxOrd}).select().single();
+    if (error) { errBox.textContent=error.message; errBox.style.display='block'; }
+    else { questions.push(data); render(); newTextArea.value=''; addArea.style.display='none'; addBtn.style.display='flex'; }
+    addConfirm.textContent = 'Add';
+  }
+  addConfirm.addEventListener('click',doAdd);
+
+  function render() {
+    const active = questions.filter(q=>q.is_active).length;
+    subhead.textContent = `${active} active · ${questions.length} total · Drag to reorder`;
+    listEl.innerHTML = '';
+    if (questions.length === 0) {
+      listEl.appendChild(el('div',{className:'card',style:{textAlign:'center',padding:'48px'}},
+        el('div',{style:{fontSize:'44px',marginBottom:'14px'}},'❋'),
+        el('h3',{style:{fontSize:'18px',marginBottom:'8px'}},'No questions yet'),
+        el('p',{style:{color:'var(--text2)',fontSize:'14px',marginBottom:'22px',maxWidth:'300px',margin:'0 auto 22px'}},'Add habits you want to track daily.'),
+        el('button',{className:'btn btn-primary',onClick:()=>{ addArea.style.display='block'; addBtn.style.display='none'; newTextArea.focus(); }},'+ Add First Question')
+      ));
+      return;
+    }
+    questions.forEach((q,i) => {
+      const isEditing = false;
+      const card = buildQCard(q, i);
+      listEl.appendChild(card);
+    });
+    listEl.appendChild(el('div',{className:'tip'},'✦ Disabled questions are hidden from daily forms but historical responses are preserved. Drag ⠿ to reorder.'));
+  }
+
+  function buildQCard(q, i) {
+    const card = el('div',{style:{background:'var(--card)',border:'1px solid var(--border)',borderRadius:'11px',padding:'13px 15px',marginBottom:'8px',transition:'all .15s',cursor:'grab'}});
+
+    // View mode
+    const viewRow = el('div',{style:{display:'flex',alignItems:'center',gap:'9px'}});
+    const handle = el('span',{className:'drag-handle'},'⠿');
+    const numBadge = el('div',{style:{width:'22px',height:'22px',borderRadius:'6px',flexShrink:'0',background:q.is_active?'rgba(124,106,247,.15)':'var(--bg3)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'9px',fontWeight:'700',color:q.is_active?'var(--accent)':'var(--text3)'}},String(i+1).padStart(2,'0'));
+    const textWrap = el('div',{style:{flex:'1',minWidth:'0'}},
+      el('p',{style:{fontSize:'13px',color:q.is_active?'var(--text)':'var(--text3)',textDecoration:q.is_active?'none':'line-through',lineHeight:'1.4'}},q.text),
+      el('p',{style:{fontSize:'10px',color:'var(--text3)',marginTop:'1px'}},`Added ${fmtDate(q.created_at.split('T')[0],{month:'short',day:'numeric',year:'numeric'})}`)
+    );
+    const actBtns = el('div',{style:{display:'flex',gap:'4px',flexShrink:'0'}});
+
+    const togBtn = el('button',{title:q.is_active?'Disable':'Enable',style:{width:'29px',height:'29px',borderRadius:'7px',background:q.is_active?'rgba(52,211,153,.12)':'var(--bg3)',border:`1px solid ${q.is_active?'rgba(52,211,153,.25)':'var(--border)'}`,color:q.is_active?'var(--yes)':'var(--text3)',cursor:'pointer',fontSize:'13px',display:'flex',alignItems:'center',justifyContent:'center',transition:'all .15s'}},q.is_active?'◉':'◎');
+    const editBtn = el('button',{title:'Edit',style:{width:'29px',height:'29px',borderRadius:'7px',background:'var(--bg3)',border:'1px solid var(--border)',color:'var(--text2)',cursor:'pointer',fontSize:'13px',display:'flex',alignItems:'center',justifyContent:'center',transition:'all .15s'}},'✎');
+    const delBtn  = el('button',{title:'Delete',style:{width:'29px',height:'29px',borderRadius:'7px',background:'transparent',border:'1px solid var(--border)',color:'var(--text3)',cursor:'pointer',fontSize:'13px',display:'flex',alignItems:'center',justifyContent:'center',transition:'all .15s'}},'✕');
+
+    togBtn.addEventListener('click', async()=>{
+      await sb.from('questions').update({is_active:!q.is_active}).eq('id',q.id).eq('user_id',uid);
+      q.is_active = !q.is_active;
+      togBtn.textContent = q.is_active?'◉':'◎';
+      togBtn.style.background = q.is_active?'rgba(52,211,153,.12)':'var(--bg3)';
+      togBtn.style.borderColor = q.is_active?'rgba(52,211,153,.25)':'var(--border)';
+      togBtn.style.color = q.is_active?'var(--yes)':'var(--text3)';
+      textWrap.children[0].style.color = q.is_active?'var(--text)':'var(--text3)';
+      textWrap.children[0].style.textDecoration = q.is_active?'none':'line-through';
+      numBadge.style.background = q.is_active?'rgba(124,106,247,.15)':'var(--bg3)';
+      numBadge.style.color = q.is_active?'var(--accent)':'var(--text3)';
+    });
+
+    editBtn.addEventListener('click', ()=>{
+      // Swap to edit mode inline
+      viewRow.style.display = 'none';
+      const ta = el('textarea',{className:'inp',rows:'2',style:{resize:'vertical',marginBottom:'9px'}},q.text);
+      const saveBtn = el('button',{className:'btn btn-primary',style:{padding:'7px 15px',fontSize:'12px'}},'Save');
+      const cancelBtn = el('button',{className:'btn btn-ghost',style:{padding:'7px 11px',fontSize:'12px'}},'Cancel');
+      const editRow = el('div',{},ta,el('div',{style:{display:'flex',gap:'7px'}},saveBtn,cancelBtn));
+      card.appendChild(editRow);
+      ta.focus(); ta.selectionStart = ta.value.length;
+      saveBtn.addEventListener('click',async()=>{
+        const t=ta.value.trim(); if(!t) return;
+        saveBtn.innerHTML='<span class="spinner"></span>';
+        await sb.from('questions').update({text:t}).eq('id',q.id).eq('user_id',uid);
+        q.text = t; textWrap.children[0].textContent = t;
+        card.removeChild(editRow); viewRow.style.display='flex';
+        saveBtn.textContent='Save';
+      });
+      cancelBtn.addEventListener('click',()=>{ card.removeChild(editRow); viewRow.style.display='flex'; });
+    });
+
+    delBtn.addEventListener('click', async()=>{
+      if (!confirm('Delete this question? Historical responses are preserved.')) return;
+      await sb.from('questions').delete().eq('id',q.id).eq('user_id',uid);
+      questions = questions.filter(x=>x.id!==q.id);
+      render();
+    });
+
+    actBtns.appendChild(togBtn); actBtns.appendChild(editBtn); actBtns.appendChild(delBtn);
+    viewRow.appendChild(handle); viewRow.appendChild(numBadge); viewRow.appendChild(textWrap); viewRow.appendChild(actBtns);
+    card.appendChild(viewRow);
+
+    // Drag
+    card.setAttribute('draggable','true');
+    card.setAttribute('data-id',q.id);
+    card.addEventListener('dragstart',e=>{ draggingId=q.id; card.style.opacity='.5'; e.dataTransfer.effectAllowed='move'; });
+    card.addEventListener('dragend',  ()=>{ draggingId=null; card.style.opacity='1'; listEl.querySelectorAll('[data-id]').forEach(x=>x.style.border='1px solid var(--border)'); });
+    card.addEventListener('dragover', e=>{ e.preventDefault(); card.style.border='1px solid rgba(124,106,247,.4)'; card.style.background='rgba(124,106,247,.08)'; });
+    card.addEventListener('dragleave',()=>{ card.style.border='1px solid var(--border)'; card.style.background='var(--card)'; });
+    card.addEventListener('drop',async e=>{
+      e.preventDefault(); card.style.border='1px solid var(--border)'; card.style.background='var(--card)';
+      if (!draggingId || draggingId===q.id) return;
+      const from=questions.findIndex(x=>x.id===draggingId);
+      const to  =questions.findIndex(x=>x.id===q.id);
+      const reord=[...questions];
+      const [moved]=reord.splice(from,1);
+      reord.splice(to,0,moved);
+      questions=reord.map((x,idx)=>({...x,sort_order:idx}));
+      render();
+      await Promise.all(questions.map(x=>sb.from('questions').update({sort_order:x.sort_order}).eq('id',x.id).eq('user_id',uid)));
+    });
+
+    return card;
+  }
+
+  load();
+}
+
+// ══════════════════════════════════════════════════════════════
+// SETTINGS
+// ══════════════════════════════════════════════════════════════
+async function renderSettings(wrap, uid) {
+  wrap.appendChild(ph('Settings','Profile, reminders & Zapier integration'));
+  const loader = el('div',{style:{padding:'40px',textAlign:'center'}},el('div',{className:'spinner',style:{width:'26px',height:'26px'}}));
+  wrap.appendChild(loader);
+
+  const { data: profile } = await sb.from('profiles').select('*').eq('id',uid).single();
+  loader.remove();
+
+  let fullName=profile?.full_name||'';
+  let timezone=profile?.timezone||'Asia/Kolkata';
+  let remTime=profile?.reminder_time?.slice(0,5)||'21:00';
+  let remEnabled=profile?.reminder_enabled||false;
+  let zapierUrl=profile?.zapier_webhook_url||'';
+
+  const TIMEZONES=['Asia/Kolkata','Asia/Dubai','Asia/Singapore','Asia/Tokyo','Europe/London','Europe/Paris','America/New_York','America/Chicago','America/Los_Angeles','Australia/Sydney'];
+  const TIMES=['06:00','07:00','08:00','09:00','10:00','12:00','14:00','16:00','18:00','19:00','20:00','21:00','22:00','23:00'];
+
+  function section(title, icon, ...kids) {
+    return el('div',{className:'card',style:{marginBottom:'14px'}},
+      el('div',{style:{display:'flex',alignItems:'center',gap:'7px',marginBottom:'14px',paddingBottom:'11px',borderBottom:'1px solid var(--border)'}},
+        el('span',{style:{fontSize:'13px'}},icon),
+        el('h2',{style:{fontFamily:"'Syne',sans-serif",fontSize:'14px',fontWeight:'700'}},title)
+      ),
+      el('div',{style:{display:'flex',flexDirection:'column',gap:'13px'}},...kids)
+    );
+  }
+  function field(label, child) {
+    return el('div',{},
+      el('label',{style:{fontSize:'12px',color:'var(--text2)',fontWeight:'500',display:'block',marginBottom:'5px'}},label),
+      child
+    );
+  }
+  function toggleSwitch(val, onChange) {
+    const sw = el('button',{className:'sw-wrap',style:{background:val?'var(--accent)':'var(--bg3)',border:`1px solid ${val?'var(--accent2)':'var(--border2)'}`}});
+    const knob = el('div',{className:'sw-knob',style:{left:val?'23px':'3px'}});
+    sw.appendChild(knob);
+    sw._val = val;
+    sw.addEventListener('click',()=>{
+      sw._val = !sw._val;
+      sw.style.background = sw._val?'var(--accent)':'var(--bg3)';
+      knob.style.left = sw._val?'23px':'3px';
+      onChange(sw._val);
+    });
+    return sw;
+  }
+
+  // Profile section
+  const nameInp = el('input',{className:'inp',value:fullName,placeholder:'Your name'});
+  nameInp.addEventListener('input',e=>fullName=e.target.value);
+  const tzSel = el('select',{className:'inp'});
+  TIMEZONES.forEach(tz=>{ const o=el('option',{value:tz},tz); if(tz===timezone)o.selected=true; tzSel.appendChild(o); });
+  tzSel.addEventListener('change',e=>timezone=e.target.value);
+  wrap.appendChild(section('Profile','◈',
+    field('Full Name',nameInp),
+    field('Email',el('input',{className:'inp',value:session?.user?.email||'',disabled:'',style:{opacity:'.5',cursor:'not-allowed'}})),
+    field('Timezone',tzSel)
+  ));
+
+  // Reminder section
+  const remTimeBtnsWrap = el('div',{style:{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(82px,1fr))',gap:'7px',marginTop:'8px',display: remEnabled?'grid':'none'}});
+  const remTimeBtns = {};
+  TIMES.forEach(t=>{
+    const b=el('button',{style:{padding:'8px 6px',borderRadius:'8px',fontSize:'12px',fontWeight:'500',textAlign:'center',background:t===remTime?'linear-gradient(135deg,#7c6af7,#a78bfa)':'var(--bg3)',color:t===remTime?'#fff':'var(--text2)',border:t===remTime?'1px solid var(--accent)':'1px solid var(--border)',cursor:'pointer',transition:'all .15s'}},fmtTime(t));
+    b.addEventListener('click',()=>{
+      remTime=t;
+      Object.entries(remTimeBtns).forEach(([k,btn])=>{
+        btn.style.background=k===t?'linear-gradient(135deg,#7c6af7,#a78bfa)':'var(--bg3)';
+        btn.style.color=k===t?'#fff':'var(--text2)';
+        btn.style.border=k===t?'1px solid var(--accent)':'1px solid var(--border)';
+      });
+    });
+    remTimeBtns[t]=b; remTimeBtnsWrap.appendChild(b);
+  });
+  const remNoteBox = el('div',{style:{marginTop:'10px',padding:'10px 13px',background:'rgba(124,106,247,.08)',border:'1px solid rgba(124,106,247,.2)',borderRadius:'9px',fontSize:'12px',color:'var(--text2)',lineHeight:'1.6',display:remEnabled?'block':'none'}});
+  remNoteBox.innerHTML = `<span style="color:var(--accent);font-weight:600">⚙ Note:</span> Reminder set for <strong style="color:var(--text)">${fmtTime(remTime)}</strong> (${timezone}). Configure your Zapier Zap to trigger at this time.`;
+
+  const remSw = toggleSwitch(remEnabled, v=>{ remEnabled=v; remTimeBtnsWrap.style.display=v?'grid':'none'; remNoteBox.style.display=v?'block':'none'; });
+
+  wrap.appendChild(section('Daily Reminder','◷',
+    el('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between'}},
+      el('div',{},
+        el('p',{style:{fontSize:'13px',color:'var(--text)',fontWeight:'500'}},'Enable Reminders'),
+        el('p',{style:{fontSize:'11px',color:'var(--text2)',marginTop:'2px'}},'Daily nudge via Zapier')
+      ),
+      remSw
+    ),
+    remTimeBtnsWrap,
+    remNoteBox
+  ));
+
+  // Zapier section
+  const zapInp = el('input',{className:'inp',value:zapierUrl,placeholder:'https://hooks.zapier.com/hooks/catch/...'});
+  zapInp.addEventListener('input',e=>zapierUrl=e.target.value);
+  const testBtn = el('button',{className:'btn btn-secondary',style:{fontSize:'13px',padding:'8px 16px'}},'⚡ Test Webhook');
+  const testMsg = el('span',{style:{fontSize:'12px',marginLeft:'10px'}});
+  testBtn.addEventListener('click',async()=>{
+    if (!zapierUrl) return;
+    testBtn.innerHTML='<span class="spinner"></span> Testing...';
+    testMsg.textContent='';
+    try {
+      await fetch(zapierUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'test',user_email:session?.user?.email,user_name:fullName,message:'✦ HabitFlow reminder test!',app_url:location.origin,timestamp:new Date().toISOString()})});
+      testMsg.style.color='var(--yes)'; testMsg.textContent='✓ Fired!';
+    } catch { testMsg.style.color='var(--no)'; testMsg.textContent='✕ Failed.'; }
+    testBtn.textContent='⚡ Test Webhook';
+  });
+
+  const zapGuide = el('div',{style:{background:'rgba(255,165,0,.06)',border:'1px solid rgba(255,165,0,.15)',borderRadius:'9px',padding:'11px 13px',marginBottom:'4px'}});
+  zapGuide.innerHTML=`<p style="font-size:12px;color:#fbbf24;font-weight:600;margin-bottom:5px">Setup Guide</p><ol style="font-size:11px;color:var(--text2);line-height:1.9;padding-left:16px"><li>Trigger: <strong style="color:var(--text)">Schedule by Zapier</strong> → daily at your reminder time</li><li>Action 1: <strong style="color:var(--text)">Webhooks → POST</strong> to the URL below</li><li>Action 2: <strong style="color:var(--text)">Gmail → Send reminder email</strong> to yourself</li><li>Paste the Catch Hook URL and test it</li></ol>`;
+
+  wrap.appendChild(section('Zapier Integration','⚡',
+    zapGuide,
+    field('Zapier Webhook URL',zapInp),
+    el('div',{style:{display:'flex',alignItems:'center'}},testBtn,testMsg)
+  ));
+
+  // Security section
+  const pwInp = el('input',{className:'inp',type:'password',placeholder:'Min. 6 characters',style:{display:'none',marginBottom:'9px'}});
+  const pwMsg2 = el('p',{style:{fontSize:'12px',marginBottom:'8px',display:'none'}});
+  const chgPwBtn = el('button',{className:'btn btn-secondary',style:{fontSize:'13px',alignSelf:'flex-start'}},'Change Password');
+  const savePwBtn = el('button',{className:'btn btn-primary',style:{fontSize:'12px',padding:'8px 16px',display:'none'}},'Update');
+  const cancelPwBtn = el('button',{className:'btn btn-ghost',style:{fontSize:'12px',display:'none'}},'Cancel');
+  chgPwBtn.addEventListener('click',()=>{ pwInp.style.display='block'; savePwBtn.style.display='flex'; cancelPwBtn.style.display='flex'; chgPwBtn.style.display='none'; });
+  cancelPwBtn.addEventListener('click',()=>{ pwInp.style.display='none'; savePwBtn.style.display='none'; cancelPwBtn.style.display='none'; chgPwBtn.style.display='flex'; pwMsg2.style.display='none'; });
+  savePwBtn.addEventListener('click',async()=>{
+    if (!pwInp.value||pwInp.value.length<6){ pwMsg2.textContent='Min 6 characters'; pwMsg2.style.color='var(--no)'; pwMsg2.style.display='block'; return; }
+    savePwBtn.innerHTML='<span class="spinner"></span>';
+    const {error}=await sb.auth.updateUser({password:pwInp.value});
+    pwMsg2.textContent=error?error.message:'✓ Password updated!'; pwMsg2.style.color=error?'var(--no)':'var(--yes)'; pwMsg2.style.display='block';
+    if(!error){ pwInp.value=''; pwInp.style.display='none'; savePwBtn.style.display='none'; cancelPwBtn.style.display='none'; chgPwBtn.style.display='flex'; }
+    savePwBtn.textContent='Update';
+  });
+  wrap.appendChild(section('Security','🔒',pwMsg2,pwInp,el('div',{style:{display:'flex',gap:'7px'}},chgPwBtn,savePwBtn,cancelPwBtn)));
+
+  // Save button
+  const saveMsg = el('span',{style:{marginLeft:'12px',fontSize:'12px',color:'var(--yes)',opacity:'0'}});
+  const saveBtn = el('button',{className:'btn btn-primary',style:{padding:'12px 28px',fontSize:'14px'}},'Save Settings');
+  saveBtn.addEventListener('click',async()=>{
+    saveBtn.innerHTML='<span class="spinner"></span> Saving...';
+    const {error}=await sb.from('profiles').update({full_name:fullName,timezone,reminder_time:remTime,reminder_enabled:remEnabled,zapier_webhook_url:zapierUrl||null}).eq('id',uid);
+    if(!error){ saveMsg.textContent='✓ All changes saved'; saveMsg.style.opacity='1'; setTimeout(()=>saveMsg.style.opacity='0',3000); }
+    saveBtn.textContent='Save Settings';
+  });
+  wrap.appendChild(el('div',{style:{marginTop:'4px',paddingBottom:'8px',display:'flex',alignItems:'center'}},saveBtn,saveMsg));
+}
+
+// ══════════════════════════════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════════════════════════════
+function ph(title, subtitle) {
+  return el('div',{className:'ph'},
+    el('h1',{},title),
+    el('p',{},subtitle)
+  );
+}
+
+// ── Boot ──────────────────────────────────────────────────────
+init();
+</script>
+</body>
+</html>
