@@ -92,7 +92,7 @@ export function HistoryPage() {
                 borderRadius: 7,
                 fontSize: 12,
                 fontWeight: 500,
-                background: view === v ? "var(--bg3)" : "transparent",
+                background: view === v ? "var(--bg-subtle)" : "transparent",
                 color: view === v ? "var(--text)" : "var(--text3)",
                 border: view === v ? "1px solid var(--border2)" : "1px solid transparent",
                 cursor: "pointer",
@@ -131,7 +131,7 @@ export function HistoryPage() {
                 borderRadius: 7,
                 fontSize: 12,
                 fontWeight: 500,
-                background: filter === v ? "var(--bg3)" : "transparent",
+                background: filter === v ? "var(--bg-subtle)" : "transparent",
                 color: filter === v ? "var(--text)" : "var(--text3)",
                 border: filter === v ? "1px solid var(--border2)" : "1px solid transparent",
                 cursor: "pointer",
@@ -162,13 +162,13 @@ export function HistoryPage() {
             {(
               [
                 ["Entries", String(entList.length), "var(--text)"],
-                ["Avg Score", `${avg}%`, "var(--accent)"],
+                ["Avg Score", `${avg}%`, "var(--color-teal)"],
                 ["Best Day", `${best}%`, "var(--yes)"],
-                ["Completion", `${Math.round((entList.length / numDays) * 100)}%`, "#a78bfa"],
+                ["Completion", `${Math.round((entList.length / numDays) * 100)}%`, "var(--color-blue)"],
               ] as const
             ).map(([l, v, c]) => (
               <div key={l} className="card" style={{ padding: "12px 13px" }}>
-                <div style={{ fontFamily: "'Syne',sans-serif", fontSize: 20, fontWeight: 800, color: c, marginBottom: 2 }}>
+                <div style={{ fontFamily: "var(--font-sans)", fontSize: 22, fontWeight: 700, color: c, marginBottom: 2 }}>
                   {v}
                 </div>
                 <div
@@ -217,7 +217,7 @@ export function HistoryPage() {
                     }}
                   >
                     <div>
-                      <h3 style={{ fontFamily: "'Syne',sans-serif", fontSize: 14 }}>
+                      <h3 style={{ fontFamily: "var(--font-sans)", fontSize: "var(--fs-h3)", fontWeight: 600 }}>
                         {fmtDate(selectedDate, {
                           weekday: "long",
                           year: "numeric",
@@ -228,7 +228,7 @@ export function HistoryPage() {
                       <div style={{ display: "flex", gap: 12, marginTop: 3 }}>
                         <span style={{ fontSize: 11, color: "var(--yes)" }}>✓ {detailEntry.yes_count}</span>
                         <span style={{ fontSize: 11, color: "var(--no)" }}>✕ {detailEntry.no_count}</span>
-                        <span style={{ fontSize: 11, color: "var(--accent)" }}>
+                        <span style={{ fontSize: 11, color: "var(--color-teal)", fontWeight: 600 }}>
                           {detailEntry.yes_percentage}% score
                         </span>
                       </div>
@@ -253,8 +253,8 @@ export function HistoryPage() {
                         display: "flex",
                         gap: 8,
                         padding: "9px 11px",
-                        background: "var(--bg2)",
-                        borderRadius: 8,
+                        background: "var(--bg-subtle)",
+                        borderRadius: 10,
                         marginBottom: 6,
                         alignItems: "flex-start",
                       }}
@@ -348,16 +348,16 @@ function CalendarView({
         ))}
         {calDays.map((d) => {
           const pct = d.entry?.yes_percentage || 0;
-          let bg = "var(--bg3)",
+          let bg = "var(--bg-subtle)",
             color = "var(--text3)";
           if (d.entry) {
             bg =
               pct >= 70
-                ? "rgba(52,211,153,.25)"
+                ? "var(--yes-bg)"
                 : pct >= 40
-                  ? "rgba(124,106,247,.25)"
-                  : "rgba(248,113,113,.25)";
-            color = pct >= 70 ? "var(--yes)" : pct >= 40 ? "var(--accent)" : "var(--no)";
+                  ? "var(--teal-soft)"
+                  : "var(--no-bg)";
+            color = pct >= 70 ? "var(--yes)" : pct >= 40 ? "var(--color-teal)" : "var(--no)";
           }
           const isToday = d.date === new Date().toISOString().split("T")[0];
           const isSel = selectedDate === d.date;
@@ -366,9 +366,9 @@ function CalendarView({
               key={d.date}
               className={"cal-day" + (d.entry ? " has-entry" : "") + (isSel ? " selected" : "")}
               style={{
-                background: isSel ? "rgba(124,106,247,.3)" : bg,
-                color,
-                border: isToday ? "2px solid rgba(124,106,247,.4)" : "1px solid transparent",
+                background: isSel ? "var(--color-primary-light)" : bg,
+                color: isSel ? "var(--color-primary-dark)" : color,
+                border: isToday ? "2px solid var(--color-primary)" : "1px solid transparent",
               }}
               onClick={() => d.entry && onSelectDay(d.entry, d.date)}
               onKeyDown={(e) => {
@@ -390,10 +390,10 @@ function CalendarView({
       >
         {(
           [
-            ["rgba(52,211,153,.25)", "var(--yes)", "≥70%"],
-            ["rgba(124,106,247,.25)", "var(--accent)", "40-69%"],
-            ["rgba(248,113,113,.25)", "var(--no)", "<40%"],
-            ["var(--bg3)", "var(--text3)", "No entry"],
+            ["var(--yes-bg)", "var(--yes)", "≥70%"],
+            ["var(--teal-soft)", "var(--color-teal)", "40-69%"],
+            ["var(--no-bg)", "var(--no)", "<40%"],
+            ["var(--bg-subtle)", "var(--text3)", "No entry"],
           ] as const
         ).map(([bg, c, l]) => (
           <div key={l} style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 10, color: c }}>
@@ -444,13 +444,15 @@ function ListView({
         return (
           <div key={month} style={{ marginBottom: 18 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 8 }}>
-              <h3 style={{ fontFamily: "'Syne',sans-serif", fontSize: 14, color: "var(--text)" }}>{label}</h3>
+              <h3 style={{ fontFamily: "var(--font-sans)", fontSize: "var(--fs-h3)", fontWeight: 600, color: "var(--text)" }}>
+                {label}
+              </h3>
               <span
                 style={{
-                  fontSize: 10,
-                  color: "var(--accent)",
-                  background: "rgba(124,106,247,.12)",
-                  padding: "2px 9px",
+                  fontSize: "var(--fs-caption)",
+                  color: "var(--color-teal)",
+                  background: "var(--teal-soft)",
+                  padding: "3px 10px",
                   borderRadius: 20,
                   fontWeight: 600,
                 }}
@@ -460,7 +462,7 @@ function ListView({
             </div>
             {mDays.map((e) => {
               const pct = e.yes_percentage || 0;
-              const color = pct >= 70 ? "var(--yes)" : pct >= 40 ? "var(--accent)" : "var(--no)";
+              const color = pct >= 70 ? "var(--yes)" : pct >= 40 ? "var(--color-teal)" : "var(--no)";
               const active = selectedDate === e.entry_date;
               return (
                 <button
@@ -475,12 +477,11 @@ function ListView({
                       height: 34,
                       borderRadius: 7,
                       flexShrink: 0,
-                      background:
-                        pct >= 70 ? "var(--yes-bg)" : pct >= 40 ? "rgba(124,106,247,.12)" : "var(--no-bg)",
+                      background: pct >= 70 ? "var(--yes-bg)" : pct >= 40 ? "var(--teal-soft)" : "var(--no-bg)",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      fontFamily: "'Syne',sans-serif",
+                      fontFamily: "var(--font-sans)",
                       fontWeight: 800,
                       fontSize: 12,
                       color,

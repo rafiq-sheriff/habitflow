@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { sb } from "@/lib/supabaseClient";
+import { missingSupabaseEnv, sb, supabaseEnvErrorMessage } from "@/lib/supabaseClient";
 
 type Mode = "login" | "signup";
 
@@ -59,12 +59,12 @@ export function AuthPage() {
     <div
       style={{
         position: "absolute",
-        width: 500,
-        height: 500,
+        width: 480,
+        height: 480,
         borderRadius: "50%",
-        background: "radial-gradient(circle,rgba(124,106,247,.1) 0%,transparent 70%)",
-        top: -150,
-        left: -150,
+        background: "radial-gradient(circle, rgba(34, 197, 94, 0.12) 0%, transparent 68%)",
+        top: -160,
+        left: -140,
         pointerEvents: "none",
       }}
     />
@@ -73,11 +73,11 @@ export function AuthPage() {
     <div
       style={{
         position: "absolute",
-        width: 400,
-        height: 400,
+        width: 420,
+        height: 420,
         borderRadius: "50%",
-        background: "radial-gradient(circle,rgba(167,139,250,.07) 0%,transparent 70%)",
-        bottom: -100,
+        background: "radial-gradient(circle, rgba(20, 184, 166, 0.1) 0%, transparent 68%)",
+        bottom: -120,
         right: -100,
         pointerEvents: "none",
       }}
@@ -103,32 +103,41 @@ export function AuthPage() {
         <div style={{ textAlign: "center", marginBottom: 36 }}>
           <div
             style={{
-              width: 54,
-              height: 54,
-              borderRadius: 15,
-              background: "linear-gradient(135deg,#7c6af7,#a78bfa)",
+              width: 56,
+              height: 56,
+              borderRadius: 16,
+              background: "linear-gradient(145deg, var(--color-primary), var(--color-primary-dark))",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              fontSize: 24,
-              margin: "0 auto 14px",
-              boxShadow: "0 8px 32px rgba(124,106,247,.35)",
+              fontSize: 26,
+              margin: "0 auto 16px",
+              color: "#fff",
+              boxShadow: "0 12px 40px rgba(34, 197, 94, 0.28)",
             }}
           >
             ✦
           </div>
-          <h1 style={{ fontSize: 27, marginBottom: 6 }}>HabitFlow</h1>
-          <p style={{ color: "var(--text2)", fontSize: 14 }}>Track habits. Reflect daily. Build streaks.</p>
+          <h1 style={{ fontSize: "var(--fs-h1)", marginBottom: 8 }}>HabitFlow</h1>
+          <p style={{ color: "var(--text2)", fontSize: "var(--fs-body)" }}>
+            Track habits. Reflect daily. Build streaks.
+          </p>
         </div>
-        <div className="card" style={{ padding: 28, boxShadow: "0 8px 40px rgba(0,0,0,.6)" }}>
+        <div
+          className="card"
+          style={{
+            padding: 28,
+            boxShadow: "var(--shadow-md), 0 12px 40px rgba(15, 23, 42, 0.06)",
+          }}
+        >
           <div
             style={{
               display: "flex",
-              background: "var(--bg2)",
-              borderRadius: 10,
-              padding: 3,
+              background: "var(--bg-subtle)",
+              borderRadius: 12,
+              padding: 4,
               marginBottom: 22,
-              gap: 3,
+              gap: 4,
             }}
           >
             {(["login", "signup"] as const).map((m) => (
@@ -139,12 +148,14 @@ export function AuthPage() {
                 style={{
                   flex: 1,
                   justifyContent: "center",
-                  padding: 8,
+                  padding: "10px 8px",
                   fontSize: 13,
-                  background: mode === m ? "var(--bg3)" : "transparent",
+                  fontWeight: 600,
+                  background: mode === m ? "var(--bg-elevated)" : "transparent",
                   color: mode === m ? "var(--text)" : "var(--text3)",
-                  border: mode === m ? "1px solid var(--border2)" : "1px solid transparent",
-                  borderRadius: 8,
+                  border: mode === m ? "1px solid var(--border)" : "1px solid transparent",
+                  borderRadius: 10,
+                  boxShadow: mode === m ? "var(--shadow-sm)" : "none",
                 }}
                 onClick={() => {
                   setMode(m);
@@ -224,6 +235,11 @@ export function AuthPage() {
             {errHtml && (
               <div className="msg-err" style={{ display: "block" }} dangerouslySetInnerHTML={{ __html: errHtml }} />
             )}
+            {missingSupabaseEnv && (
+              <div className="msg-err" style={{ display: "block" }}>
+                {supabaseEnvErrorMessage}
+              </div>
+            )}
             {okHtml && (
               <div className="msg-ok" style={{ display: "block" }} dangerouslySetInnerHTML={{ __html: okHtml }} />
             )}
@@ -231,7 +247,7 @@ export function AuthPage() {
               type="submit"
               className="btn btn-primary"
               style={{ width: "100%", justifyContent: "center", padding: "13px", fontSize: 15, marginTop: 4 }}
-              disabled={busy}
+              disabled={busy || missingSupabaseEnv}
             >
               {busy ? <span className="spinner" /> : mode === "login" ? "Sign In" : "Create Account"}
             </button>

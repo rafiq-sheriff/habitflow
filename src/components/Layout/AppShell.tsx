@@ -1,4 +1,6 @@
 import { useMemo, useState } from "react";
+import type { LucideIcon } from "lucide-react";
+import { ClipboardList, History, LayoutDashboard, MessageSquareMore, Settings } from "lucide-react";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { today } from "@/lib/dateUtils";
@@ -7,12 +9,12 @@ export type AppShellOutletContext = {
   refreshDailyBadge: () => void;
 };
 
-const NAV: { path: string; label: string; icon: string; id: string }[] = [
-  { id: "dashboard", path: "/dashboard", label: "Dashboard", icon: "◈" },
-  { id: "daily", path: "/daily", label: "Daily Form", icon: "✦" },
-  { id: "history", path: "/history", label: "History", icon: "◷" },
-  { id: "questions", path: "/questions", label: "Questions", icon: "❋" },
-  { id: "settings", path: "/settings", label: "Settings", icon: "⚙" },
+const NAV: { path: string; label: string; Icon: LucideIcon; id: string }[] = [
+  { id: "dashboard", path: "/dashboard", label: "Dashboard", Icon: LayoutDashboard },
+  { id: "daily", path: "/daily", label: "Daily Form", Icon: ClipboardList },
+  { id: "history", path: "/history", label: "History", Icon: History },
+  { id: "questions", path: "/questions", label: "Questions", Icon: MessageSquareMore },
+  { id: "settings", path: "/settings", label: "Settings", Icon: Settings },
 ];
 
 export function AppShell() {
@@ -40,15 +42,17 @@ export function AppShell() {
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <div
               style={{
-                width: 32,
-                height: 32,
-                borderRadius: 9,
-                background: "linear-gradient(135deg,#7c6af7,#a78bfa)",
+                width: 36,
+                height: 36,
+                borderRadius: 12,
+                background: "linear-gradient(145deg, var(--color-primary), var(--color-primary-dark))",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                fontSize: 15,
+                fontSize: 16,
                 flexShrink: 0,
+                color: "#fff",
+                boxShadow: "0 4px 12px rgba(34, 197, 94, 0.25)",
               }}
             >
               ✦
@@ -56,15 +60,16 @@ export function AppShell() {
             <div>
               <div
                 style={{
-                  fontFamily: "'Syne',sans-serif",
-                  fontWeight: 800,
-                  fontSize: 14,
+                  fontFamily: "var(--font-sans)",
+                  fontWeight: 700,
+                  fontSize: 15,
                   color: "var(--text)",
+                  letterSpacing: "-0.02em",
                 }}
               >
                 HabitFlow
               </div>
-              <div style={{ fontSize: 10, color: "var(--text3)" }}>Daily Reflection</div>
+              <div style={{ fontSize: 11, color: "var(--text3)", fontWeight: 500 }}>Daily Reflection</div>
             </div>
           </div>
         </div>
@@ -76,7 +81,7 @@ export function AppShell() {
               className={({ isActive }) => "nav-item" + (isActive ? " active" : "")}
               style={{ display: "flex", alignItems: "center", textDecoration: "none" }}
             >
-              <span style={{ fontSize: 15, width: 18, textAlign: "center" }}>{n.icon}</span>
+              <n.Icon size={18} strokeWidth={2} style={{ flexShrink: 0, opacity: 0.92 }} aria-hidden />
               <span style={{ color: "inherit" }}>{n.label}</span>
               {n.id === "daily" && (
                 <span
@@ -85,7 +90,7 @@ export function AppShell() {
                     width: 6,
                     height: 6,
                     borderRadius: "50%",
-                    background: submittedToday ? "var(--yes)" : "var(--accent)",
+                    background: submittedToday ? "var(--yes)" : "var(--color-teal)",
                     display: "block",
                     flexShrink: 0,
                     animation: submittedToday ? "none" : "pulse 2s infinite",
@@ -102,7 +107,7 @@ export function AppShell() {
                 width: 28,
                 height: 28,
                 borderRadius: "50%",
-                background: "linear-gradient(135deg,#7c6af7,#a78bfa)",
+                background: "linear-gradient(145deg, var(--color-teal), var(--color-blue))",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -174,8 +179,9 @@ export function AppShell() {
             to={n.path}
             className={({ isActive }) => "mob-btn" + (isActive ? " active" : "")}
             style={{ textDecoration: "none" }}
+            aria-label={n.label}
           >
-            <span style={{ fontSize: 19 }}>{n.icon}</span>
+            <n.Icon size={24} strokeWidth={2} aria-hidden />
           </NavLink>
         ))}
       </div>

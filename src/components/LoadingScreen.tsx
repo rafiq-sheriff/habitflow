@@ -15,13 +15,14 @@ export function LoadingScreen() {
         style={{
           width: 44,
           height: 44,
-          borderRadius: 12,
-          background: "linear-gradient(135deg,#7c6af7,#a78bfa)",
+          borderRadius: 14,
+          background: "linear-gradient(145deg, var(--color-primary), var(--color-primary-dark))",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
           fontSize: 22,
-          boxShadow: "0 6px 24px rgba(124,106,247,.35)",
+          color: "#fff",
+          boxShadow: "0 8px 24px rgba(34, 197, 94, 0.28)",
         }}
       >
         ✦

@@ -3,8 +3,8 @@
   "short_name": "HabitFlow",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0b0b10",
-  "theme_color": "#7c6af7",
+  "background_color": "#F9FAFB",
+  "theme_color": "#22C55E",
   "icons": [
     {
       "src": "/icons/icon-192.svg",

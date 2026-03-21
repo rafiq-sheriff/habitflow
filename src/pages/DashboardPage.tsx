@@ -22,7 +22,7 @@ function BarChart({
               style={{
                 width: "100%",
                 height: `${Math.max(h, 2)}px`,
-                background: d.color || "#7c6af7",
+                background: d.color || "var(--color-teal)",
                 opacity: d.value > 0 ? 1 : 0.3,
               }}
             />
@@ -88,8 +88,8 @@ export function DashboardPage() {
     return (
       <>
         <div style={{ marginBottom: 22 }}>
-          <p style={{ color: "var(--text2)", fontSize: 14, marginBottom: 3 }}>{greet},</p>
-          <h1 style={{ fontSize: 25 }}>{name} 👋</h1>
+          <p style={{ color: "var(--text2)", fontSize: "var(--fs-body)", marginBottom: 4 }}>{greet},</p>
+          <h1 style={{ fontSize: "var(--fs-h1)", fontWeight: 700 }}>{name} 👋</h1>
         </div>
         <div style={{ padding: 40, textAlign: "center" }}>
           <div className="spinner" style={{ width: 28, height: 28 }} />
@@ -101,36 +101,38 @@ export function DashboardPage() {
   return (
     <>
       <div style={{ marginBottom: 22 }}>
-        <p style={{ color: "var(--text2)", fontSize: 14, marginBottom: 3 }}>{greet},</p>
-        <h1 style={{ fontSize: 25 }}>{name} 👋</h1>
+        <p style={{ color: "var(--text2)", fontSize: "var(--fs-body)", marginBottom: 4 }}>{greet},</p>
+        <h1 style={{ fontSize: "var(--fs-h1)", fontWeight: 700 }}>{name} 👋</h1>
       </div>
 
       {!todayEntry && (
         <div
           style={{
-            background: "linear-gradient(135deg,rgba(124,106,247,.18),rgba(167,139,250,.08))",
-            border: "1px solid rgba(124,106,247,.3)",
-            borderRadius: 13,
-            padding: "14px 18px",
-            marginBottom: 20,
+            background: "linear-gradient(135deg, var(--color-primary-light), rgba(20, 184, 166, 0.12))",
+            border: "1px solid rgba(34, 197, 94, 0.28)",
+            borderRadius: 16,
+            padding: "16px 20px",
+            marginBottom: 24,
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
             gap: 12,
+            boxShadow: "var(--shadow-sm)",
           }}
         >
           <div>
             <div
               style={{
-                fontFamily: "'Syne',sans-serif",
+                fontFamily: "var(--font-sans)",
                 fontWeight: 700,
-                fontSize: 14,
-                marginBottom: 2,
+                fontSize: 15,
+                marginBottom: 4,
+                color: "var(--text)",
               }}
             >
               Today&apos;s reflection is waiting ✦
             </div>
-            <div style={{ fontSize: 12, color: "var(--text2)" }}>
+            <div style={{ fontSize: "var(--fs-small)", color: "var(--text2)" }}>
               {fmtDate(today(), { weekday: "long", month: "long", day: "numeric" })}
             </div>
           </div>
@@ -148,10 +150,10 @@ export function DashboardPage() {
       <div className="stat-grid">
         {(
           [
-            ["🔥", "Current Streak", `${streak} days`, "#f97316"],
-            ["📅", "Total Entries", String(days.length), "var(--accent)"],
+            ["🔥", "Current Streak", `${streak} days`, "var(--warning)"],
+            ["📅", "Total Entries", String(days.length), "var(--color-teal)"],
             ["✓", "Avg Score", `${avgScore}%`, "var(--yes)"],
-            ["✦", "Yes Answers", String(totalYes), "#a78bfa"],
+            ["✦", "Yes Answers", String(totalYes), "var(--color-blue)"],
           ] as const
         ).map(([icon, label, val, color]) => (
           <div key={label} className="stat-card">
@@ -159,10 +161,10 @@ export function DashboardPage() {
               <span style={{ fontSize: 18 }}>{icon}</span>
               <span
                 style={{
-                  fontSize: 9,
+                  fontSize: "var(--fs-caption)",
                   color: "var(--text3)",
-                  background: "var(--bg3)",
-                  padding: "2px 7px",
+                  background: "var(--bg-subtle)",
+                  padding: "3px 8px",
                   borderRadius: 20,
                   fontWeight: 600,
                   letterSpacing: ".04em",
@@ -181,21 +183,21 @@ export function DashboardPage() {
       </div>
 
       <div className="card" style={{ marginBottom: 16 }}>
-        <div style={{ fontFamily: "'Syne',sans-serif", fontSize: 14, fontWeight: 700, marginBottom: 2 }}>
+        <div style={{ fontFamily: "var(--font-sans)", fontSize: "var(--fs-h3)", fontWeight: 600, marginBottom: 4 }}>
           30-Day Score Trend
         </div>
-        <div style={{ fontSize: 11, color: "var(--text3)", marginBottom: 10 }}>
+        <div style={{ fontSize: "var(--fs-caption)", color: "var(--text3)", marginBottom: 12, fontWeight: 500 }}>
           Daily yes % over last 30 days
         </div>
         {days.length > 1 ? (
           <BarChart
-            dataArr={days.map((d) => ({
+            dataArr={days.map((d, i) => ({
               label: new Date(d.entry_date + "T12:00").toLocaleDateString("en-US", {
                 month: "short",
                 day: "numeric",
               }),
               value: Number(d.yes_percentage || 0),
-              color: "#7c6af7",
+              color: i % 2 === 0 ? "var(--color-teal)" : "var(--color-blue)",
             }))}
           />
         ) : (
@@ -216,35 +218,37 @@ export function DashboardPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 16 }}>
         <div className="card">
-          <div style={{ fontFamily: "'Syne',sans-serif", fontSize: 13, fontWeight: 700, marginBottom: 2 }}>
+          <div style={{ fontFamily: "var(--font-sans)", fontSize: "var(--fs-h3)", fontWeight: 600, marginBottom: 4 }}>
             This Week
           </div>
-          <div style={{ fontSize: 11, color: "var(--text3)", marginBottom: 12 }}>Daily completion</div>
+          <div style={{ fontSize: "var(--fs-caption)", color: "var(--text3)", marginBottom: 12, fontWeight: 500 }}>
+            Daily completion
+          </div>
           <div style={{ display: "flex", gap: 6 }}>
             {Array.from({ length: 7 }, (_, j) => 6 - j).map((i) => {
               const d = new Date(Date.now() - i * 86400000);
               const ds = d.toISOString().split("T")[0]!;
               const entry = days.find((x) => x.entry_date === ds);
               const pct = entry?.yes_percentage || 0;
-              let bg = "var(--bg3)",
+              let bg = "var(--bg-subtle)",
                 color = "var(--text3)";
               if (entry) {
                 bg =
                   pct >= 70
-                    ? "rgba(52,211,153,.28)"
+                    ? "var(--yes-bg)"
                     : pct >= 40
-                      ? "rgba(124,106,247,.28)"
-                      : "rgba(248,113,113,.28)";
-                color = pct >= 70 ? "var(--yes)" : pct >= 40 ? "var(--accent)" : "var(--no)";
+                      ? "var(--teal-soft)"
+                      : "var(--no-bg)";
+                color = pct >= 70 ? "var(--yes)" : pct >= 40 ? "var(--color-teal)" : "var(--no)";
               }
               return (
                 <div key={ds} style={{ flex: 1, textAlign: "center" }}>
                   <div
                     style={{
                       aspectRatio: "1",
-                      borderRadius: 6,
+                      borderRadius: 10,
                       background: bg,
-                      border: `1px solid ${entry ? "rgba(255,255,255,.1)" : "var(--border)"}`,
+                      border: `1px solid ${entry ? "var(--border)" : "var(--border)"}`,
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
@@ -266,10 +270,12 @@ export function DashboardPage() {
         </div>
 
         <div className="card">
-          <div style={{ fontFamily: "'Syne',sans-serif", fontSize: 13, fontWeight: 700, marginBottom: 2 }}>
+          <div style={{ fontFamily: "var(--font-sans)", fontSize: "var(--fs-h3)", fontWeight: 600, marginBottom: 4 }}>
             Week Answers
           </div>
-          <div style={{ fontSize: 11, color: "var(--text3)", marginBottom: 6 }}>Yes (green) vs No (red)</div>
+          <div style={{ fontSize: "var(--fs-caption)", color: "var(--text3)", marginBottom: 8, fontWeight: 500 }}>
+            Yes (green) vs No (red)
+          </div>
           {(() => {
             const weekData: { label: string; yes: number; no: number }[] = [];
             for (let i = 6; i >= 0; i--) {
@@ -312,10 +318,10 @@ export function DashboardPage() {
 
       {qStats.length > 0 && (
         <div className="card">
-          <div style={{ fontFamily: "'Syne',sans-serif", fontSize: 14, fontWeight: 700, marginBottom: 2 }}>
+          <div style={{ fontFamily: "var(--font-sans)", fontSize: "var(--fs-h3)", fontWeight: 600, marginBottom: 4 }}>
             Habit Performance
           </div>
-          <div style={{ fontSize: 11, color: "var(--text3)", marginBottom: 14 }}>
+          <div style={{ fontSize: "var(--fs-caption)", color: "var(--text3)", marginBottom: 16, fontWeight: 500 }}>
             All-time yes rate per habit
           </div>
           {[...qStats]
@@ -323,7 +329,7 @@ export function DashboardPage() {
             .slice(0, 7)
             .map((q) => {
               const pct = q.yes_percentage || 0;
-              const color = pct >= 70 ? "var(--yes)" : pct >= 40 ? "var(--accent)" : "var(--no)";
+              const color = pct >= 70 ? "var(--yes)" : pct >= 40 ? "var(--color-teal)" : "var(--no)";
               return (
                 <div key={q.question_text} style={{ marginBottom: 11 }}>
                   <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 3 }}>

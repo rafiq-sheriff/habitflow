@@ -17,27 +17,30 @@ function SubmittedSummary({ responses }: { responses: ResponseRow[] }) {
     <>
       <div
         style={{
-          background: "linear-gradient(135deg,rgba(52,211,153,.12),rgba(124,106,247,.12))",
-          border: "1px solid rgba(52,211,153,.2)",
-          borderRadius: 15,
-          padding: 26,
-          marginBottom: 18,
+          background: "linear-gradient(135deg, var(--color-primary-light), rgba(20, 184, 166, 0.1))",
+          border: "1px solid rgba(34, 197, 94, 0.22)",
+          borderRadius: 16,
+          padding: 28,
+          marginBottom: 22,
           textAlign: "center",
+          boxShadow: "var(--shadow-sm)",
         }}
       >
         <div style={{ fontSize: 36, marginBottom: 10 }}>🎉</div>
-        <h2 style={{ fontSize: 19, marginBottom: 5 }}>Today&apos;s reflection done!</h2>
-        <p style={{ color: "var(--text2)", fontSize: 14, marginBottom: 18 }}>Great job. Keep that streak going!</p>
+        <h2 style={{ fontSize: "var(--fs-h2)", marginBottom: 8 }}>Today&apos;s reflection done!</h2>
+        <p style={{ color: "var(--text2)", fontSize: "var(--fs-body)", marginBottom: 20 }}>
+          Great job. Keep that streak going!
+        </p>
         <div style={{ display: "flex", justifyContent: "center", gap: 28 }}>
           {(
             [
               ["Yes", yes, "var(--yes)"],
               ["No", no, "var(--no)"],
-              ["Score", `${pct}%`, "var(--accent)"],
+              ["Score", `${pct}%`, "var(--color-teal)"],
             ] as const
           ).map(([l, v, c]) => (
             <div key={l} style={{ textAlign: "center" }}>
-              <div style={{ fontFamily: "'Syne',sans-serif", fontSize: 26, fontWeight: 800, color: c }}>
+              <div style={{ fontFamily: "var(--font-sans)", fontSize: 28, fontWeight: 700, color: c }}>
                 {String(v)}
               </div>
               <div
@@ -147,8 +150,8 @@ function QuestionCard({
           style={{
             width: 23,
             height: 23,
-            borderRadius: 7,
-            background: "var(--bg3)",
+            borderRadius: 8,
+            background: "var(--bg-subtle)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -185,7 +188,7 @@ function QuestionCard({
             padding: "7px 12px",
             borderRadius: 8,
             fontSize: 12,
-            background: noteOpen ? "var(--bg3)" : "transparent",
+            background: noteOpen ? "var(--bg-subtle)" : "transparent",
             border: "1px solid var(--border)",
             color: "var(--text3)",
             cursor: "pointer",
@@ -355,7 +358,7 @@ export function DailyFormPage() {
       <div className="card" style={{ marginBottom: 18 }}>
         <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 7 }}>
           <span style={{ fontSize: 13, color: "var(--text2)" }}>Progress</span>
-          <span style={{ fontSize: 13, fontWeight: 600, color: "var(--accent)" }}>
+          <span style={{ fontSize: 13, fontWeight: 600, color: "var(--color-primary-dark)" }}>
             {doneCount} / {qs.length}
           </span>
         </div>

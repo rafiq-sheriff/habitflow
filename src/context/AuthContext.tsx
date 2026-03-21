@@ -8,7 +8,7 @@ import {
   type ReactNode,
 } from "react";
 import type { Session } from "@supabase/supabase-js";
-import { sb } from "@/lib/supabaseClient";
+import { missingSupabaseEnv, sb } from "@/lib/supabaseClient";
 
 type AuthCtx = {
   session: Session | null;
@@ -23,6 +23,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (missingSupabaseEnv) {
+      setLoading(false);
+      return;
+    }
+
     let cancelled = false;
     void sb.auth.getSession().then(({ data: { session: s } }) => {
       if (!cancelled) {

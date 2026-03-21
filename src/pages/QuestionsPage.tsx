@@ -76,14 +76,14 @@ export function QuestionsPage() {
         <div
           style={{
             display: "block",
-            background: "rgba(124,106,247,.08)",
-            border: "1px solid rgba(124,106,247,.25)",
-            borderRadius: 13,
-            padding: 16,
-            marginBottom: 14,
+            background: "var(--teal-soft)",
+            border: "1px solid rgba(20, 184, 166, 0.35)",
+            borderRadius: 16,
+            padding: 18,
+            marginBottom: 16,
           }}
         >
-          <p style={{ fontSize: 12, fontWeight: 600, color: "var(--accent)", marginBottom: 8 }}>New Question</p>
+          <p style={{ fontSize: 12, fontWeight: 600, color: "var(--color-teal)", marginBottom: 8 }}>New Question</p>
           <textarea
             className="inp"
             placeholder="e.g. Did I exercise for 30 minutes today?"
@@ -241,8 +241,8 @@ function QuestionListItem({
       }}
       onDragOver={(e) => {
         e.preventDefault();
-        e.currentTarget.style.border = "1px solid rgba(124,106,247,.4)";
-        e.currentTarget.style.background = "rgba(124,106,247,.08)";
+        e.currentTarget.style.border = "1px solid rgba(20, 184, 166, 0.45)";
+        e.currentTarget.style.background = "var(--teal-soft)";
       }}
       onDragLeave={(e) => {
         e.currentTarget.style.border = "1px solid var(--border)";
@@ -265,13 +265,13 @@ function QuestionListItem({
               height: 22,
               borderRadius: 6,
               flexShrink: 0,
-              background: local.is_active ? "rgba(124,106,247,.15)" : "var(--bg3)",
+              background: local.is_active ? "var(--accent-soft)" : "var(--bg-subtle)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               fontSize: 9,
               fontWeight: 700,
-              color: local.is_active ? "var(--accent)" : "var(--text3)",
+              color: local.is_active ? "var(--color-primary-dark)" : "var(--text3)",
             }}
           >
             {String(index + 1).padStart(2, "0")}
@@ -299,8 +299,8 @@ function QuestionListItem({
                 width: 29,
                 height: 29,
                 borderRadius: 7,
-                background: local.is_active ? "rgba(52,211,153,.12)" : "var(--bg3)",
-                border: `1px solid ${local.is_active ? "rgba(52,211,153,.25)" : "var(--border)"}`,
+                background: local.is_active ? "var(--yes-bg)" : "var(--bg-subtle)",
+                border: `1px solid ${local.is_active ? "rgba(34, 197, 94, 0.35)" : "var(--border)"}`,
                 color: local.is_active ? "var(--yes)" : "var(--text3)",
                 cursor: "pointer",
                 fontSize: 13,
@@ -320,7 +320,7 @@ function QuestionListItem({
                 width: 29,
                 height: 29,
                 borderRadius: 7,
-                background: "var(--bg3)",
+                background: "var(--bg-subtle)",
                 border: "1px solid var(--border)",
                 color: "var(--text2)",
                 cursor: "pointer",

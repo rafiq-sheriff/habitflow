@@ -299,9 +299,9 @@ export function SettingsPage() {
                   fontSize: 12,
                   fontWeight: 500,
                   textAlign: "center",
-                  background: t === remTime ? "linear-gradient(135deg,#7c6af7,#a78bfa)" : "var(--bg3)",
+                  background: t === remTime ? "linear-gradient(145deg, var(--color-primary), var(--color-primary-dark))" : "var(--bg-subtle)",
                   color: t === remTime ? "#fff" : "var(--text2)",
-                  border: t === remTime ? "1px solid var(--accent)" : "1px solid var(--border)",
+                  border: t === remTime ? "1px solid var(--color-primary-dark)" : "1px solid var(--border)",
                   cursor: "pointer",
                   transition: "all .15s",
                 }}
@@ -316,16 +316,16 @@ export function SettingsPage() {
           <div
             style={{
               marginTop: 10,
-              padding: "10px 13px",
-              background: "rgba(124,106,247,.08)",
-              border: "1px solid rgba(124,106,247,.2)",
-              borderRadius: 9,
+              padding: "12px 14px",
+              background: "var(--blue-soft)",
+              border: "1px solid rgba(14, 165, 233, 0.25)",
+              borderRadius: 12,
               fontSize: 12,
               color: "var(--text2)",
               lineHeight: 1.6,
             }}
           >
-            <span style={{ color: "var(--accent)", fontWeight: 600 }}>⚙ Note:</span> Reminder set for{" "}
+            <span style={{ color: "var(--color-blue)", fontWeight: 600 }}>⚙ Note:</span> Reminder set for{" "}
             <strong style={{ color: "var(--text)" }}>{fmtTime(remTime)}</strong> ({timezone}). Keep notification permission enabled in
             your browser to receive alerts.
           </div>
@@ -335,10 +335,10 @@ export function SettingsPage() {
       <Section title="Push Notifications" icon="🔔">
         <div
           style={{
-            background: "rgba(124,106,247,.08)",
-            border: "1px solid rgba(124,106,247,.2)",
-            borderRadius: 9,
-            padding: "11px 13px",
+            background: "var(--bg-subtle)",
+            border: "1px solid var(--border)",
+            borderRadius: 12,
+            padding: "12px 14px",
             marginBottom: 4,
           }}
         >
@@ -438,7 +438,7 @@ function Section({ title, icon, children }: { title: string; icon: string; child
         }}
       >
         <span style={{ fontSize: 13 }}>{icon}</span>
-        <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: 14, fontWeight: 700 }}>{title}</h2>
+        <h2 style={{ fontFamily: "var(--font-sans)", fontSize: "var(--fs-h3)", fontWeight: 600 }}>{title}</h2>
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 13 }}>{children}</div>
     </div>
@@ -460,8 +460,8 @@ function ToggleSwitch({ value, onChange }: { value: boolean; onChange: (v: boole
       type="button"
       className="sw-wrap"
       style={{
-        background: value ? "var(--accent)" : "var(--bg3)",
-        border: `1px solid ${value ? "var(--accent2)" : "var(--border2)"}`,
+        background: value ? "var(--color-primary)" : "var(--bg-subtle)",
+        border: `1px solid ${value ? "var(--color-primary-dark)" : "var(--border)"}`,
       }}
       onClick={() => onChange(!value)}
     >
