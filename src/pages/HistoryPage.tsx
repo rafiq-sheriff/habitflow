@@ -207,17 +207,26 @@ export function HistoryPage() {
                   <div className="spinner" style={{ width: 20, height: 20 }} />
                 </div>
               ) : (
-                <div className="card">
+                <div className="card" style={{ minWidth: 0 }}>
                   <div
                     style={{
                       display: "flex",
-                      alignItems: "center",
+                      alignItems: "flex-start",
                       justifyContent: "space-between",
+                      gap: 10,
+                      flexWrap: "wrap",
                       marginBottom: 12,
                     }}
                   >
-                    <div>
-                      <h3 style={{ fontFamily: "var(--font-sans)", fontSize: "var(--fs-h3)", fontWeight: 600 }}>
+                    <div style={{ minWidth: 0, flex: "1 1 200px" }}>
+                      <h3
+                        style={{
+                          fontFamily: "var(--font-sans)",
+                          fontSize: "var(--fs-h3)",
+                          fontWeight: 600,
+                          wordBreak: "break-word",
+                        }}
+                      >
                         {fmtDate(selectedDate, {
                           weekday: "long",
                           year: "numeric",
@@ -443,8 +452,25 @@ function ListView({
         const mAvg = Math.round(mDays.reduce((s, d) => s + (d.yes_percentage || 0), 0) / mDays.length);
         return (
           <div key={month} style={{ marginBottom: 18 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 8 }}>
-              <h3 style={{ fontFamily: "var(--font-sans)", fontSize: "var(--fs-h3)", fontWeight: 600, color: "var(--text)" }}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 9,
+                marginBottom: 8,
+                flexWrap: "wrap",
+                rowGap: 6,
+              }}
+            >
+              <h3
+                style={{
+                  fontFamily: "var(--font-sans)",
+                  fontSize: "var(--fs-h3)",
+                  fontWeight: 600,
+                  color: "var(--text)",
+                  minWidth: 0,
+                }}
+              >
                 {label}
               </h3>
               <span
@@ -455,6 +481,7 @@ function ListView({
                   padding: "3px 10px",
                   borderRadius: 20,
                   fontWeight: 600,
+                  flexShrink: 0,
                 }}
               >
                 {mDays.length} entries · {mAvg}% avg

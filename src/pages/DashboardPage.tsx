@@ -12,7 +12,8 @@ function BarChart({
 }) {
   const slice = dataArr.length > 20 ? dataArr.filter((_, i) => i % 2 === 0) : dataArr;
   return (
-    <div className="chart-bars">
+    <div className="chart-bars-scroll">
+      <div className="chart-bars">
       {slice.map((d, i) => {
         const h = Math.round((d.value / 100) * 100);
         return (
@@ -30,6 +31,7 @@ function BarChart({
           </div>
         );
       })}
+      </div>
     </div>
   );
 }
@@ -107,20 +109,17 @@ export function DashboardPage() {
 
       {!todayEntry && (
         <div
+          className="dashboard-cta"
           style={{
             background: "linear-gradient(135deg, var(--color-primary-light), rgba(20, 184, 166, 0.12))",
             border: "1px solid rgba(34, 197, 94, 0.28)",
             borderRadius: 16,
             padding: "16px 20px",
             marginBottom: 24,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: 12,
             boxShadow: "var(--shadow-sm)",
           }}
         >
-          <div>
+          <div style={{ minWidth: 0, flex: "1 1 200px" }}>
             <div
               style={{
                 fontFamily: "var(--font-sans)",
@@ -136,14 +135,16 @@ export function DashboardPage() {
               {fmtDate(today(), { weekday: "long", month: "long", day: "numeric" })}
             </div>
           </div>
-          <button
-            type="button"
-            className="btn btn-primary"
-            style={{ flexShrink: 0, padding: "9px 16px", fontSize: 13 }}
-            onClick={() => navigate("/daily")}
-          >
-            Start Now
-          </button>
+          <div className="dashboard-cta-actions">
+            <button
+              type="button"
+              className="btn btn-primary"
+              style={{ flexShrink: 0, padding: "9px 16px", fontSize: 13 }}
+              onClick={() => navigate("/daily")}
+            >
+              Start Now
+            </button>
+          </div>
         </div>
       )}
 
@@ -216,8 +217,8 @@ export function DashboardPage() {
         )}
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 16 }}>
-        <div className="card">
+      <div className="dashboard-two-col">
+        <div className="card" style={{ minWidth: 0 }}>
           <div style={{ fontFamily: "var(--font-sans)", fontSize: "var(--fs-h3)", fontWeight: 600, marginBottom: 4 }}>
             This Week
           </div>
@@ -269,7 +270,7 @@ export function DashboardPage() {
           </div>
         </div>
 
-        <div className="card">
+        <div className="card" style={{ minWidth: 0 }}>
           <div style={{ fontFamily: "var(--font-sans)", fontSize: "var(--fs-h3)", fontWeight: 600, marginBottom: 4 }}>
             Week Answers
           </div>

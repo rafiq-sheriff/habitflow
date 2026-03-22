@@ -31,7 +31,15 @@ function SubmittedSummary({ responses }: { responses: ResponseRow[] }) {
         <p style={{ color: "var(--text2)", fontSize: "var(--fs-body)", marginBottom: 20 }}>
           Great job. Keep that streak going!
         </p>
-        <div style={{ display: "flex", justifyContent: "center", gap: 28 }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            gap: 28,
+            flexWrap: "wrap",
+            rowGap: 16,
+          }}
+        >
           {(
             [
               ["Yes", yes, "var(--yes)"],
@@ -166,7 +174,7 @@ function QuestionCard({
         </div>
         <p style={{ flex: 1, fontSize: 14, color: "var(--text)", lineHeight: 1.5, fontWeight: 500 }}>{q.text}</p>
       </div>
-      <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+      <div className="form-toggle-row">
         <button
           type="button"
           className={"toggle-btn toggle-yes" + (answer === true ? " active" : "")}
@@ -183,8 +191,8 @@ function QuestionCard({
         </button>
         <button
           type="button"
+          className="form-note-btn"
           style={{
-            marginLeft: "auto",
             padding: "7px 12px",
             borderRadius: 8,
             fontSize: 12,

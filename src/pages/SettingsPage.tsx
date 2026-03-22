@@ -273,8 +273,16 @@ export function SettingsPage() {
       </Section>
 
       <Section title="Daily Reminder" icon="◷">
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <div>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 12,
+            flexWrap: "wrap",
+          }}
+        >
+          <div style={{ minWidth: 0, flex: "1 1 200px" }}>
             <p style={{ fontSize: 13, color: "var(--text)", fontWeight: 500 }}>Enable Reminders</p>
             <p style={{ fontSize: 11, color: "var(--text2)", marginTop: 2 }}>Daily reminder via push notifications</p>
           </div>
@@ -354,15 +362,18 @@ export function SettingsPage() {
             )}
           </p>
         </div>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
-          <div style={{ fontSize: 12, color: "var(--text2)", lineHeight: 1.6 }}>
+        <div
+          className="settings-push-row"
+          style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}
+        >
+          <div style={{ fontSize: 12, color: "var(--text2)", lineHeight: 1.6, minWidth: 0 }}>
             {pushMsg ?? (remEnabled ? "Tap the button to enable notifications on this device." : "Enable reminders to request permission.")}
           </div>
           {remEnabled && (
             <button
               type="button"
               className="btn btn-secondary"
-              style={{ fontSize: 13, padding: "8px 16px", whiteSpace: "nowrap" }}
+              style={{ fontSize: 13, padding: "8px 16px", whiteSpace: "nowrap", flexShrink: 0 }}
               onClick={() => void enablePushSubscription()}
               disabled={pushBusy || !VAPID_PUBLIC_KEY}
             >
