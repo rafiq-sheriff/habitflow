@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import type { LucideIcon } from "lucide-react";
-import { ClipboardList, History, LayoutDashboard, MessageSquareMore, Settings } from "lucide-react";
+import { History, LayoutGrid, NotebookPen, Route, Settings } from "lucide-react";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { today } from "@/lib/dateUtils";
@@ -9,12 +9,19 @@ export type AppShellOutletContext = {
   refreshDailyBadge: () => void;
 };
 
-const NAV: { path: string; label: string; Icon: LucideIcon; id: string }[] = [
-  { id: "dashboard", path: "/dashboard", label: "Dashboard", Icon: LayoutDashboard },
-  { id: "daily", path: "/daily", label: "Daily Form", Icon: ClipboardList },
-  { id: "history", path: "/history", label: "History", Icon: History },
-  { id: "questions", path: "/questions", label: "Questions", Icon: MessageSquareMore },
-  { id: "settings", path: "/settings", label: "Settings", Icon: Settings },
+/** Order matches bottom bar: daily form → questions → **Dashboard (center)** → history → settings */
+const NAV: {
+  path: string;
+  label: string;
+  Icon: LucideIcon;
+  id: string;
+  variant: "default" | "fab";
+}[] = [
+  { id: "daily", path: "/daily", label: "Daily Form", Icon: NotebookPen, variant: "default" },
+  { id: "questions", path: "/questions", label: "Questions", Icon: Route, variant: "default" },
+  { id: "dashboard", path: "/dashboard", label: "Dashboard", Icon: LayoutGrid, variant: "fab" },
+  { id: "history", path: "/history", label: "History", Icon: History, variant: "default" },
+  { id: "settings", path: "/settings", label: "Settings", Icon: Settings, variant: "default" },
 ];
 
 export function AppShell() {
@@ -172,19 +179,41 @@ export function AppShell() {
           <Outlet context={outletCtx} />
         </div>
       </div>
-      <div id="mobile-nav">
-        {NAV.map((n) => (
-          <NavLink
-            key={n.path}
-            to={n.path}
-            className={({ isActive }) => "mob-btn" + (isActive ? " active" : "")}
-            style={{ textDecoration: "none" }}
-            aria-label={n.label}
-          >
-            <n.Icon size={24} strokeWidth={2} aria-hidden />
-          </NavLink>
-        ))}
-      </div>
+      <nav id="mobile-nav" aria-label="Primary">
+        <div className="mobile-nav-shell">
+          {NAV.map((n) =>
+            n.variant === "fab" ? (
+              <NavLink
+                key={n.path}
+                to={n.path}
+                className={({ isActive }) => "mob-nav-fab" + (isActive ? " active" : "")}
+                aria-label={n.label}
+              >
+                <n.Icon size={27} strokeWidth={2} className="mob-nav-fab-icon" aria-hidden />
+              </NavLink>
+            ) : (
+              <NavLink
+                key={n.path}
+                to={n.path}
+                className={({ isActive }) => "mob-nav-item" + (isActive ? " active" : "")}
+                aria-label={n.label}
+              >
+                <span className="mob-nav-item-inner">
+                  <n.Icon size={24} strokeWidth={1.65} aria-hidden />
+                  {n.id === "daily" && (
+                    <span
+                      className={
+                        "mob-nav-daily-dot" + (submittedToday ? " mob-nav-daily-dot--done" : "")
+                      }
+                      aria-hidden
+                    />
+                  )}
+                </span>
+              </NavLink>
+            ),
+          )}
+        </div>
+      </nav>
     </>
   );
 }
