@@ -48,7 +48,7 @@ function urlBase64ToUint8Array(base64String: string): Uint8Array {
 }
 
 export function SettingsPage() {
-  const { session } = useAuth();
+  const { session, signOut } = useAuth();
   const uid = session!.user.id;
   const [loading, setLoading] = useState(true);
   const [fullName, setFullName] = useState("");
@@ -63,6 +63,7 @@ export function SettingsPage() {
   const [pushBusy, setPushBusy] = useState(false);
   const [notifPermission, setNotifPermission] = useState<NotificationPermission | null>(null);
   const [pushMsg, setPushMsg] = useState<string | null>(null);
+  const [logoutBusy, setLogoutBusy] = useState(false);
 
   useEffect(() => {
     let c = false;
@@ -232,6 +233,16 @@ export function SettingsPage() {
       setTimeout(() => setSaveMsg(false), 3000);
     }
     setSaveBusy(false);
+  }
+
+  async function handleLogout(): Promise<void> {
+    if (logoutBusy) return;
+    setLogoutBusy(true);
+    try {
+      await signOut();
+    } finally {
+      setLogoutBusy(false);
+    }
   }
 
   if (loading) {
@@ -421,6 +432,15 @@ export function SettingsPage() {
             </>
           )}
         </div>
+        <button
+          type="button"
+          className="btn btn-secondary"
+          style={{ fontSize: 13, alignSelf: "flex-start" }}
+          onClick={() => void handleLogout()}
+          disabled={logoutBusy}
+        >
+          {logoutBusy ? <span className="spinner" /> : "Log Out"}
+        </button>
       </Section>
 
       <div style={{ marginTop: 4, paddingBottom: 8, display: "flex", alignItems: "center" }}>

@@ -1,6 +1,6 @@
 {
-  "name": "HabitFlow",
-  "short_name": "HabitFlow",
+  "name": "HabitTrace",
+  "short_name": "HabitTrace",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#F9FAFB",

@@ -74,7 +74,7 @@ export function AppShell() {
                   letterSpacing: "-0.02em",
                 }}
               >
-                HabitFlow
+                HabitTrace
               </div>
               <div style={{ fontSize: 11, color: "var(--text3)", fontWeight: 500 }}>Daily Reflection</div>
             </div>

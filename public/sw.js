@@ -19,9 +19,9 @@ self.addEventListener("push", (event) => {
     payload = { body: event.data?.text?.() };
   }
 
-  const title = payload.title || "HabitFlow";
+  const title = payload.title || "HabitTrace";
   const body = payload.body || "Time for your daily check-in.";
-  const tag = payload.tag || "habitflow-reminder";
+  const tag = payload.tag || "habittrace-reminder";
   const url = payload.url || "/";
 
   const options = {

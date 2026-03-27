@@ -166,7 +166,7 @@ Deno.serve(async () => {
       };
 
       const payload = {
-        title: "HabitFlow Reminder",
+        title: "Habit Trace Reminder",
         body: "Time for your daily habit check-in.",
         url: "/daily",
         tag: `habitflow-${d.sent_date}`,

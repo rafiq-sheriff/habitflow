@@ -118,7 +118,7 @@ export function AuthPage() {
           >
             ✦
           </div>
-          <h1 style={{ fontSize: "var(--fs-h1)", marginBottom: 8 }}>HabitFlow</h1>
+          <h1 style={{ fontSize: "var(--fs-h1)", marginBottom: 8 }}>Habit Trace</h1>
           <p style={{ color: "var(--text2)", fontSize: "var(--fs-body)" }}>
             Track habits. Reflect daily. Build streaks.
           </p>

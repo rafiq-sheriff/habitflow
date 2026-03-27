@@ -1,4 +1,4 @@
-# HabitFlow — Daily Habit & Reflection Tracker
+# HabitTrace— Daily Habit & Reflection Tracker
 
 A production-ready daily habit tracking and reflection application with **React**, **Vite**, and **Supabase**.
 

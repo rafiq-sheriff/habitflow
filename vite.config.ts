@@ -7,4 +7,7 @@ export default defineConfig({
   resolve: {
     alias: { "@": path.resolve(__dirname, "src") },
   },
+  server: {
+    allowedHosts: ["neural-marker-investing-comfortable.trycloudflare.com"],
+  },
 });
